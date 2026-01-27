@@ -15,7 +15,7 @@
         }
 
         .glass-header {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid #e2e8f0;
         }
@@ -87,167 +87,264 @@
             pointer-events: auto;
         }
 
-        /* Avatar Omino Bianco Stylizzato */
-        .avatar-placeholder {
-            background-color: #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 9999px;
-            overflow: hidden;
+        .auth-bg {
+            background: radial-gradient(circle at top right, #dbeafe 0%, transparent 40%),
+                        radial-gradient(circle at bottom left, #f1f5f9 0%, transparent 40%);
         }
+        
+        .tab-active {
+            border-bottom: 2px solid #0f172a;
+            color: #0f172a;
+        }
+        .tab-inactive {
+            color: #94a3b8;
+            border-bottom: 2px solid transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <div id="toast-container" class="fixed bottom-6 right-6 z-[300] space-y-2"></div>
 
-    <!-- Header Professionale -->
-    <header class="glass-header sticky top-0 z-50 px-6 py-4">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-2 cursor-pointer" onclick="showScreen('home')">
-                <div class="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-                    <span class="text-white font-black text-xl">T</span>
+    <!-- SCHERMATA DI AUTENTICAZIONE -->
+    <section id="screen-auth" class="min-h-screen auth-bg flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 md:p-10 border border-slate-100 max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="text-center mb-6 shrink-0">
+                <div class="inline-flex items-center gap-2 mb-2">
+                    <div class="w-10 h-10 bg-black rounded-xl flex items-center justify-center shadow-lg">
+                        <span class="text-white font-black text-2xl">T</span>
+                    </div>
+                    <span class="font-extrabold text-2xl tracking-tight text-slate-900 uppercase">
+                        TRADE<span class="logo-lab-text">LAB</span>
+                    </span>
                 </div>
-                <span class="font-extrabold text-xl tracking-tight text-slate-900 uppercase">
-                    TRADE<span class="logo-lab-text">LAB</span>
-                </span>
+                <p class="text-slate-500 font-medium text-sm">Il marketplace per veri collezionisti.</p>
             </div>
-            
-            <nav class="hidden md:flex items-center gap-8 text-sm font-bold text-slate-600 uppercase tracking-tighter">
-                <a href="#" onclick="showScreen('home')" class="hover:text-blue-600 transition-colors">Esplora</a>
-                <a href="#" onclick="showScreen('wishlist')" class="hover:text-blue-600 transition-colors">Wishlist</a>
-                <a href="#" onclick="showScreen('favorites')" class="hover:text-blue-600 transition-colors">Preferiti</a>
-            </nav>
 
-            <div class="flex items-center gap-4">
-                <!-- Icona Omino Bianco -->
-                <button onclick="showScreen('profile')" class="group flex items-center justify-center w-10 h-10 bg-slate-200 hover:bg-slate-300 rounded-full transition-colors border border-slate-300">
-                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                    </svg>
-                </button>
+            <div class="flex mb-6 border-b border-slate-100 shrink-0">
+                <button onclick="toggleAuthTab('login')" id="tab-login" class="flex-1 pb-4 text-sm font-bold uppercase tracking-widest transition-all tab-active">Accedi</button>
+                <button onclick="toggleAuthTab('register')" id="tab-register" class="flex-1 pb-4 text-sm font-bold uppercase tracking-widest transition-all tab-inactive">Registrati</button>
+            </div>
+
+            <div id="form-login" class="space-y-5">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Email o Username</label>
+                    <input type="text" id="login-user" placeholder="nome@esempio.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Password</label>
+                    <input type="password" id="login-pass" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
+                </div>
+                <button onclick="handleLogin()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20">Entra nel Lab</button>
+                <p class="text-center text-xs text-slate-400 mt-4">Account Demo: admin / password</p>
+            </div>
+
+            <div id="form-register" class="space-y-4 hidden overflow-y-auto custom-scrollbar pr-2 pb-2">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Nome Completo</label>
+                    <input type="text" id="reg-fullname" placeholder="Mario Rossi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Nome Utente</label>
+                    <input type="text" id="reg-user" placeholder="Es. PokeMaster99" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Email</label>
+                    <input type="email" id="reg-email" placeholder="tua@email.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Telefono</label>
+                        <input type="tel" id="reg-phone" placeholder="+39..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Data di Nascita</label>
+                        <input type="date" id="reg-birth" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-500">
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Città</label>
+                    <input type="text" id="reg-city" placeholder="Roma, Milano..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Password</label>
+                    <input type="password" id="reg-pass" placeholder="Almeno 8 caratteri" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
+                </div>
+                <div class="flex items-start gap-3 p-2">
+                    <input type="checkbox" id="reg-terms" class="mt-1 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+                    <label for="reg-terms" class="text-xs text-slate-500 font-medium leading-snug">
+                        Confermo di avere più di 18 anni e accetto i <a href="#" class="text-blue-600 hover:underline">Termini</a>.
+                    </label>
+                </div>
+                <button onclick="handleRegister()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20">Registrati</button>
             </div>
         </div>
-    </header>
+    </section>
 
-    <!-- SCREEN: HOME -->
-    <section id="screen-home" class="screen active max-w-7xl mx-auto px-6 py-8 pb-32">
-        <!-- Hero Section -->
-        <div class="mb-12 grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-8 bg-slate-900 rounded-2xl p-10 text-white relative overflow-hidden border border-slate-800">
-                <div class="relative z-10 max-w-lg">
-                    <span class="text-blue-400 font-bold text-xs uppercase tracking-widest mb-4 block">Nuovi Arrivi</span>
-                    <h1 class="text-4xl md:text-5xl font-black mb-4 uppercase tracking-tighter leading-none">Il marketplace definitivo per collezionisti TCG.</h1>
-                    <p class="text-slate-400 mb-8 text-lg font-medium">Acquista, vendi e scambia carte certificate con la massima sicurezza.</p>
-                    <button onclick="showPublishModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-blue-900/20 uppercase text-xs tracking-widest">Inizia a Vendere</button>
-                </div>
-                <div class="absolute right-[-10%] top-[-10%] w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
-            </div>
-            
-            <div class="lg:col-span-4 bg-white border border-slate-200 rounded-2xl p-8 flex flex-col justify-between shadow-sm">
-                <div>
-                    <h3 class="font-black text-xl mb-2 uppercase tracking-tight">Wishlist Live</h3>
-                    <p class="text-slate-500 text-sm font-medium">Hai <span id="wishlist-count-text" class="text-blue-600 font-black">0</span> carte in osservazione.</p>
-                </div>
-                <div class="mt-6">
-                    <button onclick="showScreen('wishlist')" class="w-full py-3 border border-slate-200 rounded-xl font-bold text-xs uppercase hover:bg-slate-50 transition-colors tracking-widest">Gestisci Lista</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Ricerca e Filtri -->
-        <div class="sticky top-24 z-40 bg-slate-50/80 backdrop-blur-md py-4 mb-8">
-            <div class="flex flex-col md:flex-row gap-4">
-                <div class="search-bar-pro flex-1 flex items-center px-4 py-3">
-                    <svg class="text-slate-400 w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" id="main-search" placeholder="Cerca carta, set o utente..." class="w-full outline-none text-sm font-bold uppercase tracking-tight placeholder:text-slate-400" onkeyup="handleSearch(event)">
+    <!-- APP PRINCIPALE -->
+    <div id="app-container" class="hidden">
+        <header class="glass-header sticky top-0 z-50 px-6 py-4">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="showScreen('home')">
+                    <div class="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                        <span class="text-white font-black text-xl">T</span>
+                    </div>
+                    <span class="font-extrabold text-xl tracking-tight text-slate-900 uppercase">
+                        TRADE<span class="logo-lab-text">LAB</span>
+                    </span>
                 </div>
                 
-                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                    <button onclick="filterCategory('all', event)" class="category-btn active whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black bg-blue-600 text-white border border-blue-600 shadow-sm transition-all uppercase tracking-widest">Tutti</button>
-                    <button onclick="filterCategory('pokemon', event)" class="category-btn whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black bg-white border border-slate-200 shadow-sm hover:border-blue-500 transition-all uppercase tracking-widest">Pokémon</button>
-                    <button onclick="filterCategory('onepiece', event)" class="category-btn whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black bg-white border border-slate-200 shadow-sm hover:border-blue-500 transition-all uppercase tracking-widest">One Piece</button>
-                    <button onclick="filterCategory('yugioh', event)" class="category-btn whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black bg-white border border-slate-200 shadow-sm hover:border-blue-500 transition-all uppercase tracking-widest">Yu-Gi-Oh!</button>
-                    <button onclick="filterCategory('mtg', event)" class="category-btn whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black bg-white border border-slate-200 shadow-sm hover:border-blue-500 transition-all uppercase tracking-widest">Magic</button>
+                <nav class="hidden md:flex items-center gap-8 text-sm font-bold text-slate-600 uppercase tracking-tighter">
+                    <a href="#" onclick="showScreen('home')" class="hover:text-blue-600 transition-colors">Esplora</a>
+                    <a href="#" onclick="showScreen('wishlist')" class="hover:text-blue-600 transition-colors">Wishlist</a>
+                    <a href="#" onclick="showScreen('favorites')" class="hover:text-blue-600 transition-colors">Preferiti</a>
+                </nav>
+
+                <div class="flex items-center gap-4">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Bentornato</p>
+                        <p id="header-username" class="text-xs font-black text-slate-900 uppercase">User</p>
+                    </div>
+                    <button onclick="showScreen('profile')" class="group flex items-center justify-center w-10 h-10 bg-slate-200 hover:bg-slate-300 rounded-full transition-colors border border-slate-300 overflow-hidden">
+                        <img id="header-avatar" src="" class="w-full h-full object-cover">
+                    </button>
                 </div>
             </div>
-        </div>
+        </header>
 
-        <!-- Grid Prodotti -->
-        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
-        <div id="search-empty" class="hidden py-20 text-center flex flex-col items-center">
-            <h3 class="text-xl font-black text-slate-800 uppercase tracking-tighter">Nessun match trovato</h3>
-            <p class="text-slate-500 font-medium">Prova a resettare i filtri.</p>
-        </div>
-    </section>
-
-    <!-- SCREEN: FAVORITES -->
-    <section id="screen-favorites" class="screen max-w-7xl mx-auto px-6 py-12">
-        <h2 class="text-4xl font-black mb-8 text-slate-900 uppercase tracking-tighter">I tuoi Preferiti</h2>
-        <div id="fav-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6"></div>
-        <div id="empty-fav" class="hidden text-center py-20 text-slate-400 font-bold uppercase text-xs tracking-widest">Ancora nulla nei preferiti.</div>
-    </section>
-
-    <!-- SCREEN: WISHLIST -->
-    <section id="screen-wishlist" class="screen max-w-4xl mx-auto px-6 py-12">
-        <div class="flex justify-between items-center mb-10">
-            <div>
-                <h2 class="text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none">Wishlist</h2>
-                <p class="text-slate-500 mt-2 font-medium">Avvisami quando queste carte compaiono.</p>
+        <!-- SCREEN: HOME -->
+        <section id="screen-home" class="screen active max-w-7xl mx-auto px-6 py-8 pb-32">
+            <div class="mb-12 grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-8 bg-slate-900 rounded-2xl p-10 text-white relative overflow-hidden border border-slate-800">
+                    <div class="relative z-10 max-w-lg">
+                        <span class="text-blue-400 font-bold text-xs uppercase tracking-widest mb-4 block">Nuovi Arrivi</span>
+                        <h1 class="text-4xl md:text-5xl font-black mb-4 uppercase tracking-tighter leading-none">Il marketplace definitivo.</h1>
+                        <p class="text-slate-400 mb-8 text-lg font-medium">Acquista, vendi e scambia carte certificate con sicurezza.</p>
+                        <button onclick="showPublishModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-blue-900/20 uppercase text-xs tracking-widest">Inizia a Vendere</button>
+                    </div>
+                    <div class="absolute right-[-10%] top-[-10%] w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+                </div>
+                
+                <div class="lg:col-span-4 bg-white border border-slate-200 rounded-2xl p-8 flex flex-col justify-between shadow-sm">
+                    <div>
+                        <h3 class="font-black text-xl mb-2 uppercase tracking-tight">Wishlist Live</h3>
+                        <p class="text-slate-500 text-sm font-medium">Hai <span id="wishlist-count-text" class="text-blue-600 font-black">0</span> carte in osservazione.</p>
+                    </div>
+                    <div class="mt-6">
+                        <button onclick="showScreen('wishlist')" class="w-full py-3 border border-slate-200 rounded-xl font-bold text-xs uppercase hover:bg-slate-50 transition-colors tracking-widest">Gestisci Lista</button>
+                    </div>
+                </div>
             </div>
-            <button onclick="showWishModal()" class="btn-primary flex items-center gap-2 uppercase text-xs tracking-widest font-black">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-                Aggiungi
+
+            <div class="sticky top-24 z-40 bg-slate-50/80 backdrop-blur-md py-4 mb-8">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="search-bar-pro flex-1 flex items-center px-4 py-3">
+                        <svg class="text-slate-400 w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <input type="text" id="main-search" placeholder="Cerca carta, set o utente..." class="w-full outline-none text-sm font-bold uppercase tracking-tight placeholder:text-slate-400" onkeyup="handleSearch(event)">
+                    </div>
+                    
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                        <button onclick="filterCategory('all', event)" class="category-btn active whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black bg-blue-600 text-white border border-blue-600 shadow-sm transition-all uppercase tracking-widest">Tutti</button>
+                        <button onclick="filterCategory('pokemon', event)" class="category-btn whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black bg-white border border-slate-200 shadow-sm hover:border-blue-500 transition-all uppercase tracking-widest">Pokémon</button>
+                        <button onclick="filterCategory('onepiece', event)" class="category-btn whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black bg-white border border-slate-200 shadow-sm hover:border-blue-500 transition-all uppercase tracking-widest">One Piece</button>
+                        <button onclick="filterCategory('yugioh', event)" class="category-btn whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black bg-white border border-slate-200 shadow-sm hover:border-blue-500 transition-all uppercase tracking-widest">Yu-Gi-Oh!</button>
+                        <button onclick="filterCategory('mtg', event)" class="category-btn whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black bg-white border border-slate-200 shadow-sm hover:border-blue-500 transition-all uppercase tracking-widest">Magic</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+            <div id="search-empty" class="hidden py-20 text-center flex flex-col items-center">
+                <h3 class="text-xl font-black text-slate-800 uppercase tracking-tighter">Nessun match trovato</h3>
+            </div>
+        </section>
+
+        <!-- SCREEN: FAVORITES -->
+        <section id="screen-favorites" class="screen max-w-7xl mx-auto px-6 py-12">
+            <h2 class="text-4xl font-black mb-8 text-slate-900 uppercase tracking-tighter">I tuoi Preferiti</h2>
+            <div id="fav-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6"></div>
+            <div id="empty-fav" class="hidden text-center py-20 text-slate-400 font-bold uppercase text-xs tracking-widest">Ancora nulla nei preferiti.</div>
+        </section>
+
+        <!-- SCREEN: WISHLIST -->
+        <section id="screen-wishlist" class="screen max-w-4xl mx-auto px-6 py-12">
+            <div class="flex justify-between items-center mb-10">
+                <div>
+                    <h2 class="text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none">Wishlist</h2>
+                    <p class="text-slate-500 mt-2 font-medium">Avvisami quando queste carte compaiono.</p>
+                </div>
+                <button onclick="showWishModal()" class="btn-primary flex items-center gap-2 uppercase text-xs tracking-widest font-black">Aggiungi</button>
+            </div>
+            <div id="wishlist-grid" class="space-y-4"></div>
+            <div id="empty-wishlist" class="hidden py-20 text-center text-slate-400 border-2 border-dashed border-slate-200 rounded-3xl font-bold uppercase text-xs">La tua lista è vuota.</div>
+        </section>
+
+        <!-- SCREEN: PROFILE -->
+        <section id="screen-profile" class="screen max-w-4xl mx-auto px-6 py-12 pb-32">
+            <div class="bg-white border border-slate-200 rounded-3xl p-8 mb-10 flex flex-col sm:flex-row items-start gap-8 shadow-sm relative">
+                
+                <div class="absolute top-6 right-6 flex gap-3">
+                    <button onclick="showEditProfileModal()" class="text-[10px] font-black uppercase text-blue-600 hover:text-blue-800 tracking-widest border border-blue-100 bg-blue-50 px-3 py-1.5 rounded-lg transition-colors">Modifica</button>
+                    <button onclick="logout()" class="text-[10px] font-black uppercase text-red-500 hover:text-red-700 tracking-widest border border-red-100 bg-red-50 px-3 py-1.5 rounded-lg transition-colors">Esci</button>
+                </div>
+
+                <div class="w-28 h-28 rounded-full border-4 border-slate-100 bg-slate-50 overflow-hidden flex-shrink-0 shadow-inner">
+                    <img id="profile-img" src="" alt="Avatar" class="w-full h-full object-cover">
+                </div>
+                
+                <div class="flex-1 w-full">
+                    <h2 class="text-3xl font-black text-slate-900 uppercase tracking-tighter" id="profile-username">Utente</h2>
+                    <p id="profile-bio" class="text-slate-500 text-sm font-medium mt-2 mb-4 leading-relaxed max-w-md italic">Nessuna biografia inserita.</p>
+                    
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-lg border border-yellow-100">
+                            <span class="text-yellow-500 text-lg">★</span>
+                            <span id="profile-rating-val" class="font-black text-slate-800 text-sm">0.0</span>
+                        </div>
+                        <span class="text-slate-400 text-xs font-bold uppercase tracking-widest"><span id="profile-reviews-count">0</span> Recensioni</span>
+                    </div>
+
+                    <div class="flex justify-start gap-2">
+                        <span class="px-3 py-1 bg-slate-900 text-[9px] font-black rounded-lg text-white uppercase tracking-widest">Seller</span>
+                        <span class="px-3 py-1 bg-blue-600 text-[9px] font-black rounded-lg text-white uppercase tracking-widest">Verified</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-12">
+                <h3 class="font-black text-sm text-slate-400 uppercase tracking-widest mb-4">Ultime Recensioni</h3>
+                <div id="reviews-list" class="space-y-3"></div>
+            </div>
+
+            <h3 class="font-black text-xl mb-6 uppercase tracking-tight flex items-center gap-3">
+                Inventario (<span id="live-inventory-count">0</span>)
+                <span class="h-px bg-slate-200 flex-1"></span>
+            </h3>
+            
+            <div id="my-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
+            <div id="empty-inventory" class="hidden py-20 text-center text-slate-400 border-2 border-dashed border-slate-200 rounded-3xl font-bold uppercase text-xs">Nessun oggetto in vendita.</div>
+        </section>
+
+        <!-- SCREEN: DETAIL -->
+        <section id="screen-detail" class="screen max-w-6xl mx-auto px-6 py-12">
+            <button onclick="showScreen('home')" class="mb-8 flex items-center gap-2 font-black text-xs text-slate-400 hover:text-slate-900 transition-colors uppercase tracking-widest">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Torna allo Shop
             </button>
-        </div>
-        <div id="wishlist-grid" class="space-y-4"></div>
-        <div id="empty-wishlist" class="hidden py-20 text-center text-slate-400 border-2 border-dashed border-slate-200 rounded-3xl font-bold uppercase text-xs">La tua lista è vuota.</div>
-    </section>
+            <div id="detail-content" class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-2xl shadow-slate-200/50"></div>
+        </section>
 
-    <!-- SCREEN: PROFILE -->
-    <section id="screen-profile" class="screen max-w-4xl mx-auto px-6 py-12 pb-32">
-        <div class="bg-white border border-slate-200 rounded-3xl p-8 mb-10 flex flex-col sm:flex-row items-center gap-6 shadow-sm">
-            <!-- Icona Omino Bianco Grande -->
-            <div class="w-24 h-24 rounded-full border-4 border-slate-100 bg-slate-200 flex items-center justify-center flex-shrink-0 text-white">
-                <svg class="w-14 h-14" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-            </div>
-            <div class="text-center sm:text-left flex-1">
-                <h2 class="text-3xl font-black text-slate-900 uppercase tracking-tighter">Market Member #842</h2>
-                <p class="text-slate-500 font-bold text-xs uppercase mb-4 tracking-widest">Account Verificato • Affidabilità ⭐ 5.0</p>
-                <div class="flex justify-center sm:justify-start gap-2">
-                    <span class="px-3 py-1 bg-slate-900 text-[9px] font-black rounded-lg text-white uppercase tracking-widest">Top Seller</span>
-                    <span class="px-3 py-1 bg-blue-600 text-[9px] font-black rounded-lg text-white uppercase tracking-widest">Collector</span>
-                </div>
-            </div>
-            <div class="flex flex-col gap-2">
-                <div class="bg-slate-50 px-6 py-3 rounded-2xl text-center border border-slate-100">
-                    <p class="text-[10px] font-black text-slate-400 uppercase">Oggetti Live</p>
-                    <p id="live-inventory-count" class="text-2xl font-black text-slate-900">0</p>
-                </div>
-            </div>
-        </div>
-        
-        <h3 class="font-black text-xl mb-6 uppercase tracking-tight flex items-center gap-3">
-            Gestisci il tuo Inventario
-            <span class="h-px bg-slate-200 flex-1"></span>
-        </h3>
-        
-        <div id="my-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
-        <div id="empty-inventory" class="hidden py-20 text-center text-slate-400 border-2 border-dashed border-slate-200 rounded-3xl font-bold uppercase text-xs">Non hai ancora messo nulla in vendita.</div>
-    </section>
-
-    <!-- SCREEN: DETAIL -->
-    <section id="screen-detail" class="screen max-w-6xl mx-auto px-6 py-12">
-        <button onclick="showScreen('home')" class="mb-8 flex items-center gap-2 font-black text-xs text-slate-400 hover:text-slate-900 transition-colors uppercase tracking-widest">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Torna allo Shop
+        <!-- FAB -->
+        <button onclick="showPublishModal()" class="fixed bottom-8 right-8 bg-blue-600 text-white px-6 py-4 rounded-full shadow-2xl shadow-blue-500/40 flex items-center gap-3 hover:scale-105 transition-all z-40">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M12 4v16m8-8H4"></path></svg>
+            <span class="font-bold text-sm uppercase">Vendi Carta</span>
         </button>
-        <div id="detail-content" class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-2xl shadow-slate-200/50"></div>
-    </section>
+    </div>
 
-    <!-- MODALI -->
+    <!-- MODALS -->
     <div id="wish-modal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-6">
         <div class="bg-white w-full max-w-md p-8 rounded-3xl shadow-2xl relative">
             <button onclick="closeWishModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-900">
@@ -255,14 +352,9 @@
             </button>
             <h2 class="text-2xl font-black mb-6 text-slate-900 uppercase tracking-tighter">Nuova Ricerca</h2>
             <div class="space-y-4">
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Nome Carta</label>
-                    <input type="text" id="w-title" placeholder="Es. Charizard" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold uppercase tracking-tight outline-none focus:border-blue-500">
-                </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Set</label>
-                    <input type="text" id="w-set" placeholder="Es. Base Set" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold uppercase tracking-tight outline-none focus:border-blue-500">
-                </div>
+                <input type="text" id="w-title" placeholder="Nome Carta..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold uppercase tracking-tight outline-none focus:border-blue-500">
+                <input type="text" id="w-set" placeholder="Set..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold uppercase tracking-tight outline-none focus:border-blue-500">
+                <input type="text" id="w-image" placeholder="URL Immagine (Opzionale)" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold tracking-tight outline-none focus:border-blue-500">
                 <button onclick="addWishManual()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black mt-4 shadow-lg shadow-blue-500/20 uppercase tracking-widest text-[10px]">Salva Wishlist</button>
             </div>
         </div>
@@ -291,116 +383,151 @@
         </div>
     </div>
 
-    <!-- Pulsante Floating -->
-    <button onclick="showPublishModal()" class="fixed bottom-8 right-8 bg-blue-600 text-white px-8 py-5 rounded-2xl shadow-2xl shadow-blue-500/40 flex items-center gap-3 hover:scale-105 active:scale-95 transition-all z-40 border-2 border-white/20">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-        <span class="font-black text-[10px] uppercase tracking-widest">Vendi</span>
-    </button>
+    <div id="edit-profile-modal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-md p-8 rounded-3xl shadow-2xl relative">
+            <button onclick="closeEditProfileModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-900">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h2 class="text-2xl font-black mb-6 text-slate-900 uppercase tracking-tighter">Modifica Profilo</h2>
+            <div class="space-y-4">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">URL Avatar</label>
+                    <input type="text" id="edit-avatar" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-medium outline-none focus:border-blue-500">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Bio (Max 150 car.)</label>
+                    <textarea id="edit-bio" rows="3" placeholder="Scrivi qualcosa su di te..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-medium outline-none focus:border-blue-500 resize-none"></textarea>
+                </div>
+                <button onclick="saveProfile()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black mt-4 uppercase tracking-widest text-[10px]">Salva Modifiche</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // --- DATA ---
+        // --- GLOBAL STATE ---
+        let userProfile = {
+            name: "User",
+            avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=User",
+            bio: "Collezionista appassionato.",
+            reviews: [
+                { user: "PokeMaster", rating: 5, text: "Spedizione velocissima, carta top!" },
+                { user: "MagicMike", rating: 4, text: "Imballaggio buono, consigliato." }
+            ]
+        };
+        
+        let currentUser = null;
+        let authMode = 'login'; 
+
+        // --- APP DATA ---
         let items = [
-            { id: 1, title: "Charizard Base Holo", price: 450, category: "pokemon", rarity: "rare", image: "https://via.placeholder.com/400x560/f8fafc/1e293b?text=Charizard+Base+Holo", seller: "Ash99", condition: "Near Mint", isMine: false },
-            { id: 5, title: "Luffy Gear 5", price: 320, category: "onepiece", rarity: "mythic", image: "https://via.placeholder.com/400x560/f8fafc/1e293b?text=Luffy+Gear+5", seller: "Kaizoku", condition: "Mint", isMine: false },
-            { id: 3, title: "Black Lotus", price: 900, category: "mtg", rarity: "mythic", image: "https://via.placeholder.com/400x560/f8fafc/1e293b?text=Black+Lotus", seller: "MagicStore", condition: "Mint", isMine: false },
-            { id: 2, title: "Blue Eyes Dragon", price: 120, category: "yugioh", rarity: "super", image: "https://via.placeholder.com/400x560/f8fafc/1e293b?text=Blue+Eyes", seller: "Seto_K", condition: "Excellent", isMine: false }
+            { id: 1, title: "Charizard Base Holo", price: 450, category: "pokemon", rarity: "rare", image: "https://images.pokemontcg.io/base1/4_hires.png", seller: "Ash99", condition: "Near Mint", isMine: false },
+            { id: 5, title: "Luffy Gear 5", price: 320, category: "onepiece", rarity: "mythic", image: "https://www.tcgplayer.com/product/516246/one-piece-card-game-awakening-of-the-new-era-monkey-d-luffy-gear-5-parallel", seller: "Kaizoku", condition: "Mint", isMine: false },
+            { id: 3, title: "Black Lotus", price: 900, category: "mtg", rarity: "mythic", image: "https://cards.scryfall.io/large/front/b/d/bd8fa327-dd41-4737-8f19-2cf5eb1f7cdd.jpg", seller: "MagicStore", condition: "Mint", isMine: false },
+            { id: 2, title: "Blue Eyes Dragon", price: 120, category: "yugioh", rarity: "super", image: "https://images.clothes.com/yugioh/cards/LOB-001.jpg", seller: "Seto_K", condition: "Excellent", isMine: false }
         ];
 
         let favorites = [];
         let manualWishlist = [];
         let currentFilterCategory = 'all';
 
-        // --- NAVIGATION ---
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            const target = document.getElementById(`screen-${screenId}`);
-            if (target) {
-                target.classList.add('active');
-                if(screenId === 'wishlist') renderWishlist();
-                if(screenId === 'favorites') renderFavorites();
-                if(screenId === 'profile') renderMyInventory();
-                if(screenId === 'home') renderProducts();
-                window.scrollTo(0, 0);
-            }
-        }
+        // --- AUTH ---
+        function toggleAuthTab(mode) {
+            authMode = mode;
+            const tabLogin = document.getElementById('tab-login');
+            const tabRegister = document.getElementById('tab-register');
+            const formLogin = document.getElementById('form-login');
+            const formRegister = document.getElementById('form-register');
 
-        // --- CORE ACTIONS ---
-        function toggleFavorite(id, e) {
-            e.stopPropagation();
-            if(favorites.includes(id)) {
-                favorites = favorites.filter(fid => fid !== id);
-                toast("Rimosso dai preferiti");
+            if(mode === 'login') {
+                formLogin.classList.remove('hidden');
+                formRegister.classList.add('hidden');
+                tabLogin.classList.replace('tab-inactive', 'tab-active');
+                tabRegister.classList.replace('tab-active', 'tab-inactive');
             } else {
-                favorites.push(id);
-                toast("Aggiunto ai preferiti!");
+                formLogin.classList.add('hidden');
+                formRegister.classList.remove('hidden');
+                tabRegister.classList.replace('tab-inactive', 'tab-active');
+                tabLogin.classList.replace('tab-active', 'tab-inactive');
             }
-            renderProductsBySearch(document.getElementById('main-search').value.toLowerCase());
         }
 
-        function publishItem() {
-            const title = document.getElementById('p-title').value;
-            const price = document.getElementById('p-price').value;
-            const imageUrl = document.getElementById('p-image-url').value;
+        function handleLogin() {
+            const user = document.getElementById('login-user').value.trim();
+            const pass = document.getElementById('login-pass').value.trim();
+            if(!user || !pass) return toast("Inserisci credenziali!");
             
-            if(!title || !price) return toast("Inserisci titolo e prezzo!");
-
-            const newItem = { 
-                id: Date.now(), 
-                title, 
-                price: parseFloat(price).toFixed(2), 
-                category: document.getElementById('p-category').value, 
-                rarity: 'common', 
-                image: imageUrl || `https://via.placeholder.com/400x560/f8fafc/1e293b?text=${encodeURIComponent(title)}`, 
-                seller: 'Tu (Market)',
-                isMine: true
-            };
-
-            items.unshift(newItem);
-            
-            document.getElementById('p-title').value = '';
-            document.getElementById('p-price').value = '';
-            document.getElementById('p-image-url').value = '';
-            
-            closePublishModal();
-            toast("Annuncio pubblicato!");
-            renderProducts();
+            userProfile.name = user;
+            userProfile.avatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user}`;
+            loginSuccess();
         }
 
-        function deleteMyItem(id, e) {
-            if(e) e.stopPropagation();
-            items = items.filter(item => item.id !== id);
-            favorites = favorites.filter(fid => fid !== id);
-            toast("Annuncio rimosso correttamente");
-            renderMyInventory();
+        function handleRegister() {
+            const user = document.getElementById('reg-user').value.trim();
+            const pass = document.getElementById('reg-pass').value.trim();
+            const terms = document.getElementById('reg-terms').checked;
+
+            if(!user || !pass) return toast("Compila i campi!");
+            if(!terms) return toast("Accetta i termini!");
+
+            userProfile.name = user;
+            userProfile.avatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user}`;
+            userProfile.reviews = [];
+            loginSuccess();
         }
 
-        // --- RENDERERS ---
-        function renderProducts(filteredItems = items) {
-            const grid = document.getElementById('product-grid');
-            grid.innerHTML = '';
-            filteredItems.forEach(item => {
-                const isFav = favorites.includes(item.id);
-                const card = document.createElement('div');
-                card.className = `card-pro p-4 flex flex-col group cursor-pointer`;
-                card.onclick = (e) => { if(!e.target.closest('.action-btn')) showDetail(item.id); };
-                card.innerHTML = `
-                    <div class="aspect-[3/4] mb-4 bg-slate-50 rounded-lg overflow-hidden relative border border-slate-100">
-                        <img src="${item.image}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                        <button onclick="toggleFavorite(${item.id}, event)" class="action-btn absolute top-2 right-2 p-2.5 bg-white/90 backdrop-blur rounded-full shadow-lg hover:bg-white transition-all">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="${isFav ? '#ef4444' : 'none'}" stroke="${isFav ? '#ef4444' : '#1e293b'}" stroke-width="3"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-                        </button>
-                    </div>
-                    <div class="flex flex-col gap-1">
-                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${item.category}</span>
-                        <h3 class="font-black text-xs text-slate-800 uppercase truncate">${item.title}</h3>
-                        <div class="flex justify-between items-center mt-4">
-                            <span class="text-lg font-black text-slate-900">${item.price} €</span>
-                            <span class="text-[8px] font-black text-slate-400 uppercase tracking-tighter bg-slate-50 px-2 py-1 rounded border border-slate-100">@${item.seller.split(' ')[0]}</span>
+        function loginSuccess() {
+            currentUser = userProfile.name;
+            document.getElementById('screen-auth').style.display = 'none';
+            document.getElementById('app-container').classList.remove('hidden');
+            document.getElementById('header-username').innerText = currentUser;
+            document.getElementById('header-avatar').src = userProfile.avatar;
+            toast(`Benvenuto, ${currentUser}!`);
+            showScreen('home');
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('app-container').classList.add('hidden');
+            document.getElementById('screen-auth').style.display = 'flex';
+        }
+
+        // --- PROFILE LOGIC ---
+        function calculateRating() {
+            if (!userProfile.reviews || userProfile.reviews.length === 0) return "0.0";
+            const sum = userProfile.reviews.reduce((acc, rev) => acc + rev.rating, 0);
+            return (sum / userProfile.reviews.length).toFixed(1);
+        }
+
+        function renderProfile() {
+            document.getElementById('profile-username').innerText = userProfile.name;
+            document.getElementById('profile-img').src = userProfile.avatar;
+            document.getElementById('profile-bio').innerText = userProfile.bio || "Nessuna bio.";
+            
+            const rating = calculateRating();
+            document.getElementById('profile-rating-val').innerText = rating;
+            document.getElementById('profile-reviews-count').innerText = userProfile.reviews.length;
+
+            const reviewsList = document.getElementById('reviews-list');
+            reviewsList.innerHTML = '';
+            
+            if (userProfile.reviews.length === 0) {
+                reviewsList.innerHTML = '<div class="text-center py-6 text-slate-300 text-xs font-bold uppercase border border-dashed border-slate-200 rounded-xl">Ancora nessuna recensione.</div>';
+            } else {
+                userProfile.reviews.forEach(rev => {
+                    const stars = '★'.repeat(rev.rating) + '☆'.repeat(5 - rev.rating);
+                    const el = document.createElement('div');
+                    el.className = 'bg-slate-50 p-4 rounded-xl border border-slate-100';
+                    el.innerHTML = `
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-black uppercase text-slate-800">@${rev.user}</span>
+                            <span class="text-yellow-500 text-xs">${stars}</span>
                         </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
+                        <p class="text-xs text-slate-500 italic">"${rev.text}"</p>
+                    `;
+                    reviewsList.appendChild(el);
+                });
+            }
+            renderMyInventory();
         }
 
         function renderMyInventory() {
@@ -409,11 +536,16 @@
             const countDisplay = document.getElementById('live-inventory-count');
             
             const myItems = items.filter(i => i.isMine);
-            countDisplay.innerText = myItems.length;
+            if(countDisplay) countDisplay.innerText = myItems.length;
             
+            if(!grid) return;
             grid.innerHTML = '';
-            if(myItems.length === 0) { empty.classList.remove('hidden'); return; }
-            empty.classList.add('hidden');
+            
+            if(myItems.length === 0) {
+                if(empty) empty.classList.remove('hidden');
+                return;
+            }
+            if(empty) empty.classList.add('hidden');
 
             myItems.forEach(item => {
                 const el = document.createElement('div');
@@ -422,87 +554,144 @@
                     <div class="relative aspect-[3/4] mb-3 rounded-lg overflow-hidden border border-slate-100 bg-slate-50">
                         <img src="${item.image}" class="w-full h-full object-cover">
                         <div class="delete-overlay absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center p-4">
-                            <button onclick="deleteMyItem(${item.id}, event)" class="action-btn bg-red-600 text-white p-3 rounded-full hover:bg-red-500 shadow-xl transform active:scale-95 transition-all">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            <button onclick="deleteMyItem(${item.id}, event)" class="bg-red-600 text-white p-3 rounded-full hover:bg-red-500 shadow-xl transition-all flex flex-col items-center gap-1">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                <span class="text-[8px] font-black uppercase">Rimuovi</span>
                             </button>
                         </div>
                     </div>
-                    <div class="flex flex-col">
-                        <h4 class="font-black text-xs uppercase text-slate-800 truncate mb-1">${item.title}</h4>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm font-black text-blue-600">${item.price} €</span>
-                            <span class="text-[8px] font-black uppercase text-green-500 bg-green-50 px-2 py-1 rounded">Live</span>
-                        </div>
+                    <h4 class="font-black text-xs uppercase text-slate-800 truncate mb-1">${item.title}</h4>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-black text-blue-600">${item.price} €</span>
+                        <span class="text-[8px] font-black uppercase text-green-500 bg-green-50 px-2 py-1 rounded">Live</span>
                     </div>
                 `;
                 grid.appendChild(el);
             });
         }
 
-        // --- UTILS ---
-        function toast(msg) {
-            const container = document.getElementById('toast-container');
-            const t = document.createElement('div');
-            t.className = 'bg-slate-900 text-white px-6 py-4 rounded-xl shadow-2xl text-[10px] font-black uppercase tracking-widest border border-white/10 animate-bounce';
-            t.innerText = msg;
-            container.appendChild(t);
-            setTimeout(() => {
-                t.style.opacity = '0';
-                t.style.transform = 'translateY(10px)';
-                t.style.transition = 'all 0.4s';
-                setTimeout(() => t.remove(), 400);
-            }, 2500);
+        function showEditProfileModal() {
+            document.getElementById('edit-avatar').value = userProfile.avatar;
+            document.getElementById('edit-bio').value = userProfile.bio;
+            document.getElementById('edit-profile-modal').classList.remove('hidden');
         }
 
-        function handleSearch(e) {
-            const query = e.target.value.toLowerCase();
-            renderProductsBySearch(query);
+        function closeEditProfileModal() {
+            document.getElementById('edit-profile-modal').classList.add('hidden');
         }
 
-        function filterCategory(cat, event) {
-            currentFilterCategory = cat;
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600', 'active');
-                btn.classList.add('bg-white', 'text-slate-900', 'border-slate-200');
-            });
-            event.target.classList.add('bg-blue-600', 'text-white', 'border-blue-600', 'active');
-            renderProductsBySearch(document.getElementById('main-search').value.toLowerCase());
+        function saveProfile() {
+            const newAvatar = document.getElementById('edit-avatar').value;
+            const newBio = document.getElementById('edit-bio').value;
+            if(newAvatar) userProfile.avatar = newAvatar;
+            userProfile.bio = newBio;
+            closeEditProfileModal();
+            renderProfile();
+            document.getElementById('header-avatar').src = userProfile.avatar;
+            toast("Profilo aggiornato!");
         }
 
-        function renderProductsBySearch(query = "") {
-            const grid = document.getElementById('product-grid');
-            const emptyMsg = document.getElementById('search-empty');
-            const filtered = items.filter(item => {
-                const matchesCategory = currentFilterCategory === 'all' || item.category === currentFilterCategory;
-                const matchesSearch = item.title.toLowerCase().includes(query) || item.seller.toLowerCase().includes(query);
-                return matchesCategory && matchesSearch;
-            });
-
-            if (filtered.length === 0) {
-                grid.innerHTML = '';
-                emptyMsg.classList.remove('hidden');
-            } else {
-                emptyMsg.classList.add('hidden');
-                renderProducts(filtered);
+        // --- NAVIGATION ---
+        function showScreen(screenId) {
+            if(!currentUser && screenId !== 'auth') return;
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById(`screen-${screenId}`);
+            if (target) {
+                target.classList.add('active');
+                if(screenId === 'wishlist') renderWishlist();
+                if(screenId === 'favorites') renderFavorites();
+                if(screenId === 'profile') renderProfile();
+                if(screenId === 'home') renderProducts();
+                window.scrollTo(0, 0);
             }
         }
 
-        function showWishModal() { document.getElementById('wish-modal').classList.remove('hidden'); }
-        function closeWishModal() { document.getElementById('wish-modal').classList.add('hidden'); }
-        function showPublishModal() { document.getElementById('publish-modal').classList.remove('hidden'); }
-        function closePublishModal() { document.getElementById('publish-modal').classList.add('hidden'); }
+        // --- CORE LOGIC ---
+        function deleteMyItem(id, e) {
+            if(e) e.stopPropagation();
+            if (confirm("L'hai venduto? Verrà generata una recensione automatica.")) {
+                const reviewers = ["PokeMaster", "YugiBoy", "CollectorX", "RedTrainer"];
+                const texts = ["Ottimo venditore!", "Tutto perfetto.", "Consigliato!", "Velocissimo."];
+                userProfile.reviews.unshift({
+                    user: reviewers[Math.floor(Math.random() * reviewers.length)],
+                    rating: Math.floor(Math.random() * 2) + 4,
+                    text: texts[Math.floor(Math.random() * texts.length)]
+                });
+            }
+            items = items.filter(i => i.id !== id);
+            renderProfile();
+            toast("Inventario aggiornato");
+        }
 
-        function addWishManual() {
-            const title = document.getElementById('w-title').value;
-            const set = document.getElementById('w-set').value;
-            if(!title || !set) return toast("Dati mancanti");
-            manualWishlist.unshift({ id: Date.now(), title, set, image: `https://via.placeholder.com/400?text=${encodeURIComponent(title)}` });
-            document.getElementById('w-title').value = '';
-            document.getElementById('w-set').value = '';
-            closeWishModal();
-            toast("Wishlist aggiornata");
-            document.getElementById('wishlist-count-text').innerText = manualWishlist.length;
-            if(document.getElementById('screen-wishlist').classList.contains('active')) renderWishlist();
+        function publishItem() {
+            const title = document.getElementById('p-title').value;
+            const price = document.getElementById('p-price').value;
+            const img = document.getElementById('p-image-url').value;
+            if(!title || !price) return toast("Dati mancanti!");
+
+            items.unshift({
+                id: Date.now(),
+                title,
+                price: parseFloat(price).toFixed(2),
+                category: document.getElementById('p-category').value,
+                image: img || `https://via.placeholder.com/400?text=${title}`,
+                seller: currentUser,
+                isMine: true
+            });
+
+            closePublishModal();
+            toast("Annuncio pubblicato!");
+            renderProducts();
+        }
+
+        function toggleFavorite(id, e) {
+            e.stopPropagation();
+            if(favorites.includes(id)) favorites = favorites.filter(fid => fid !== id);
+            else favorites.push(id);
+            renderProducts();
+        }
+
+        function renderProducts(filtered = items) {
+            const grid = document.getElementById('product-grid');
+            if(!grid) return;
+            grid.innerHTML = '';
+            filtered.forEach(item => {
+                const isFav = favorites.includes(item.id);
+                const card = document.createElement('div');
+                card.className = 'card-pro p-4 flex flex-col group cursor-pointer';
+                card.onclick = (e) => { if(!e.target.closest('button')) showDetail(item.id) };
+                card.innerHTML = `
+                    <div class="aspect-[3/4] mb-4 bg-slate-50 rounded-lg overflow-hidden relative border border-slate-100">
+                        <img src="${item.image}" class="w-full h-full object-cover">
+                        <button onclick="toggleFavorite(${item.id}, event)" class="absolute top-2 right-2 p-2 bg-white/90 rounded-full shadow hover:bg-white transition-all">
+                            <svg class="w-4 h-4" fill="${isFav ? 'red' : 'none'}" stroke="${isFav ? 'red' : 'black'}" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        </button>
+                    </div>
+                    <h3 class="font-black text-xs text-slate-800 uppercase truncate">${item.title}</h3>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-lg font-black">${item.price} €</span>
+                        <span class="text-[8px] font-bold text-slate-400 uppercase">@${item.seller}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function showDetail(id) {
+            const item = items.find(i => i.id === id);
+            const container = document.getElementById('detail-content');
+            container.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2">
+                    <div class="p-8 bg-slate-50 flex justify-center border-r border-slate-200"><img src="${item.image}" class="max-w-[300px] rounded-2xl shadow-xl"></div>
+                    <div class="p-10">
+                        <h2 class="text-3xl font-black mb-4 uppercase">${item.title}</h2>
+                        <div class="text-4xl font-black text-blue-600 mb-8">${item.price} €</div>
+                        <p class="text-slate-500 mb-8">Venduto da <span class="font-bold text-slate-900">@${item.seller}</span></p>
+                        <button onclick="toast('Richiesta inviata')" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest">Contatta Venditore</button>
+                    </div>
+                </div>
+            `;
+            showScreen('detail');
         }
 
         function renderWishlist() {
@@ -512,24 +701,16 @@
             if(manualWishlist.length === 0) { empty.classList.remove('hidden'); return; }
             empty.classList.add('hidden');
             manualWishlist.forEach(wish => {
-                const card = document.createElement('div');
-                card.className = 'bg-white border border-slate-200 rounded-2xl p-5 flex items-center justify-between shadow-sm';
-                card.innerHTML = `
+                const el = document.createElement('div');
+                el.className = 'bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between';
+                el.innerHTML = `
                     <div class="flex items-center gap-4">
-                        <div class="w-14 h-20 bg-slate-50 rounded-lg overflow-hidden border border-slate-100 flex-shrink-0">
-                            <img src="${wish.image}" class="w-full h-full object-cover">
-                        </div>
-                        <div>
-                            <h3 class="font-black text-slate-900 uppercase text-xs tracking-tight">${wish.title}</h3>
-                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">SET: ${wish.set}</p>
-                            <span class="inline-block mt-2 px-2 py-0.5 bg-blue-50 text-blue-600 text-[8px] font-black rounded uppercase">Scanning...</span>
-                        </div>
+                        <div class="w-12 h-16 bg-slate-50 rounded border flex-shrink-0"><img src="${wish.image}" class="w-full h-full object-cover"></div>
+                        <div><h3 class="font-black text-xs uppercase">${wish.title}</h3><p class="text-[9px] text-slate-400 font-bold uppercase">${wish.set}</p></div>
                     </div>
-                    <button onclick="manualWishlist = manualWishlist.filter(w=>w.id !== ${wish.id}); renderWishlist();" class="p-2 text-slate-300 hover:text-red-500">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    </button>
+                    <button onclick="manualWishlist = manualWishlist.filter(w=>w.id!==${wish.id}); renderWishlist();" class="text-slate-300 hover:text-red-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                 `;
-                grid.appendChild(card);
+                grid.appendChild(el);
             });
         }
 
@@ -541,58 +722,58 @@
             if(favItems.length === 0) { empty.classList.remove('hidden'); return; }
             empty.classList.add('hidden');
             favItems.forEach(item => {
-                const card = document.createElement('div');
-                card.className = `card-pro p-4 flex flex-col group cursor-pointer`;
-                card.onclick = () => showDetail(item.id);
-                card.innerHTML = `
-                    <div class="aspect-[3/4] mb-3 rounded-lg overflow-hidden border border-slate-100 bg-slate-50">
-                        <img src="${item.image}" class="w-full h-full object-cover">
-                    </div>
-                    <h3 class="font-black text-[10px] text-slate-800 uppercase truncate">${item.title}</h3>
-                    <div class="text-sm font-black text-slate-900 mt-1">${item.price} €</div>
-                `;
-                grid.appendChild(card);
+                const el = document.createElement('div');
+                el.className = 'card-pro p-4 cursor-pointer';
+                el.onclick = () => showDetail(item.id);
+                el.innerHTML = `<img src="${item.image}" class="aspect-[3/4] object-cover rounded mb-2"><h4 class="font-black text-[10px] uppercase truncate">${item.title}</h4>`;
+                grid.appendChild(el);
             });
         }
 
-        function showDetail(id) {
-            const item = items.find(i => i.id === id);
-            if (!item) return;
-            const container = document.getElementById('detail-content');
-            container.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2">
-                    <div class="p-8 bg-slate-50 flex items-center justify-center border-b md:border-b-0 md:border-r border-slate-200">
-                        <img src="${item.image}" class="w-full max-w-[300px] rounded-2xl shadow-2xl border-4 border-white">
-                    </div>
-                    <div class="p-10 flex flex-col justify-center">
-                        <div class="flex gap-2 mb-4">
-                            <span class="px-3 py-1 bg-blue-100 text-blue-700 text-[9px] font-black rounded-full uppercase tracking-widest">${item.category}</span>
-                            <span class="px-3 py-1 bg-slate-100 text-slate-600 text-[9px] font-black rounded-full uppercase tracking-widest">${item.condition || 'Mint'}</span>
-                        </div>
-                        <h2 class="text-4xl font-black text-slate-900 mb-6 uppercase tracking-tighter leading-none">${item.title}</h2>
-                        
-                        <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 mb-8 flex justify-between items-end">
-                            <div>
-                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Quotazione</p>
-                                <p class="text-4xl font-black text-slate-900">${item.price} €</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">VENDUTO DA</p>
-                                <p class="font-black text-slate-900 uppercase text-xs">@${item.seller.replace(/\s/g, '')}</p>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 gap-3">
-                            <button onclick="toast('Richiesta inviata!')" class="bg-slate-900 text-white py-5 rounded-2xl font-black hover:bg-black transition-all shadow-xl uppercase text-[10px] tracking-widest">Contatta Venditore</button>
-                            <button onclick="toast('Salvato')" class="border-2 border-slate-200 py-5 rounded-2xl font-black hover:bg-slate-50 transition-all uppercase text-[10px] tracking-widest">Salva per Dopo</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            showScreen('detail');
+        function addWishManual() {
+            const title = document.getElementById('w-title').value;
+            const set = document.getElementById('w-set').value;
+            if(!title) return;
+            manualWishlist.unshift({ id: Date.now(), title, set, image: `https://via.placeholder.com/100?text=${title}` });
+            closeWishModal();
+            toast("Aggiunto alla Wishlist");
+            document.getElementById('wishlist-count-text').innerText = manualWishlist.length;
         }
+
+        function filterCategory(cat, e) {
+            currentFilterCategory = cat;
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active', 'bg-blue-600', 'text-white'));
+            e.target.classList.add('active', 'bg-blue-600', 'text-white');
+            renderProductsBySearch(document.getElementById('main-search').value.toLowerCase());
+        }
+
+        function handleSearch(e) { renderProductsBySearch(e.target.value.toLowerCase()); }
+
+        function renderProductsBySearch(query = "") {
+            const filtered = items.filter(i => {
+                const matchCat = currentFilterCategory === 'all' || i.category === currentFilterCategory;
+                const matchSearch = i.title.toLowerCase().includes(query);
+                return matchCat && matchSearch;
+            });
+            renderProducts(filtered);
+        }
+
+        function toast(m) {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = 'bg-slate-900 text-white px-6 py-3 rounded-xl shadow-xl text-[10px] font-black uppercase';
+            t.innerText = m;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 2500);
+        }
+
+        function showWishModal() { document.getElementById('wish-modal').classList.remove('hidden'); }
+        function closeWishModal() { document.getElementById('wish-modal').classList.add('hidden'); }
+        function showPublishModal() { document.getElementById('publish-modal').classList.remove('hidden'); }
+        function closePublishModal() { document.getElementById('publish-modal').classList.add('hidden'); }
 
         window.onload = () => { renderProducts(); };
     </script>
 </body>
 </html>
+
