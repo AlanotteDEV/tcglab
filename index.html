@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TCG TRADE LAB - Professional Marketplace</title>
     <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,11 +12,14 @@
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
             color: #1e293b;
+            -webkit-tap-highlight-color: transparent; /* Rimuove highlight al tocco su mobile */
         }
 
+        /* Glassmorphism */
         .glass-header {
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid #e2e8f0;
         }
 
@@ -29,6 +32,7 @@
                  1px  1px 0 #000;
         }
 
+        /* Card Animations */
         .card-pro {
             background: white;
             border: 1px solid #e2e8f0;
@@ -37,29 +41,27 @@
             position: relative;
         }
 
-        .card-pro:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.1);
-            border-color: #cbd5e1;
+        .card-pro:active {
+            transform: scale(0.98); /* Feedback tattile su mobile */
         }
 
-        .btn-primary {
-            background-color: #0f172a;
-            color: white;
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.2s;
+        @media (min-width: 768px) {
+            .card-pro:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.1);
+                border-color: #cbd5e1;
+            }
         }
 
-        .btn-primary:hover {
-            background-color: #334155;
+        /* Inputs mobile friendly */
+        input, select, textarea {
+            font-size: 16px !important; /* Previene zoom su iOS */
         }
 
         .search-bar-pro {
             background: white;
             border: 1px solid #e2e8f0;
-            border-radius: 10px;
+            border-radius: 12px;
             transition: all 0.2s;
         }
 
@@ -68,24 +70,31 @@
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
         }
 
-        .screen { display: none; }
-        .screen.active { display: block; animation: fadeIn 0.4s ease; }
+        /* Transitions */
+        .screen { display: none; padding-bottom: 100px; /* Spazio per la bottom nav */ }
+        .screen.active { display: block; animation: fadeIn 0.3s ease; }
+        
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
+        /* Desktop Hover delete */
         .delete-overlay {
             opacity: 0;
             transition: opacity 0.2s;
             pointer-events: none;
         }
-        .card-pro:hover .delete-overlay {
-            opacity: 1;
-            pointer-events: auto;
+        @media (min-width: 768px) {
+            .card-pro:hover .delete-overlay {
+                opacity: 1;
+                pointer-events: auto;
+            }
         }
+        /* Mobile delete always accessible via button (handled in JS/HTML logic ideally, keeping simple here) */
 
         .auth-bg {
             background: radial-gradient(circle at top right, #dbeafe 0%, transparent 40%),
@@ -101,40 +110,69 @@
             border-bottom: 2px solid transparent;
         }
 
+        /* Chat Styles */
         .chat-bubble {
-            max-width: 80%;
+            max-width: 85%;
             padding: 10px 14px;
-            border-radius: 14px;
-            font-size: 0.85rem;
+            border-radius: 18px;
+            font-size: 0.9rem;
             line-height: 1.4;
             position: relative;
         }
         .chat-mine {
             background-color: #2563eb;
             color: white;
-            border-bottom-right-radius: 2px;
+            border-bottom-right-radius: 4px;
             align-self: flex-end;
         }
         .chat-other {
             background-color: #f1f5f9;
             color: #1e293b;
-            border-bottom-left-radius: 2px;
+            border-bottom-left-radius: 4px;
             align-self: flex-start;
         }
 
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* Mobile Bottom Nav */
+        .bottom-nav-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            transition: color 0.2s;
+        }
+        .bottom-nav-item.active {
+            color: #2563eb;
+        }
+        .bottom-nav-item.active svg {
+            stroke-width: 2.5px;
+        }
+        .bottom-nav-indicator {
+            position: absolute;
+            top: -12px;
+            width: 40px;
+            height: 4px;
+            background: #2563eb;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+            display: none;
+        }
+        .bottom-nav-item.active .bottom-nav-indicator { display: block; }
     </style>
 </head>
 <body>
 
-    <div id="toast-container" class="fixed bottom-6 right-6 z-[300] space-y-2"></div>
+    <div id="toast-container" class="fixed top-6 left-1/2 -translate-x-1/2 z-[300] w-full max-w-xs px-4 pointer-events-none space-y-2 text-center"></div>
 
     <!-- SCHERMATA DI AUTENTICAZIONE -->
-    <section id="screen-auth" class="min-h-screen auth-bg flex items-center justify-center p-6">
-        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 md:p-10 border border-slate-100 max-h-[90vh] overflow-hidden flex flex-col">
-            <div class="text-center mb-6 shrink-0">
+    <section id="screen-auth" class="min-h-screen auth-bg flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-xl p-6 md:p-10 border border-slate-100 max-h-[95vh] overflow-y-auto flex flex-col">
+            <div class="text-center mb-6 shrink-0 mt-4">
                 <div class="inline-flex items-center gap-2 mb-2">
                     <div class="w-10 h-10 bg-black rounded-xl flex items-center justify-center shadow-lg">
                         <span class="text-white font-black text-2xl">T</span>
@@ -146,12 +184,12 @@
                 <p class="text-slate-500 font-medium text-sm">Il marketplace per veri collezionisti.</p>
             </div>
 
-            <div class="flex mb-6 border-b border-slate-100 shrink-0">
+            <div class="flex mb-6 border-b border-slate-100 shrink-0 sticky top-0 bg-white z-10 pt-2">
                 <button onclick="toggleAuthTab('login')" id="tab-login" class="flex-1 pb-4 text-sm font-bold uppercase tracking-widest transition-all tab-active">Accedi</button>
                 <button onclick="toggleAuthTab('register')" id="tab-register" class="flex-1 pb-4 text-sm font-bold uppercase tracking-widest transition-all tab-inactive">Registrati</button>
             </div>
 
-            <div id="form-login" class="space-y-5">
+            <div id="form-login" class="space-y-5 pb-4">
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Email o Username</label>
                     <input type="text" id="login-user" placeholder="nome@esempio.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
@@ -160,15 +198,11 @@
                     <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Password</label>
                     <input type="password" id="login-pass" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
                 </div>
-                <button onclick="handleLogin()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20">Entra nel Lab</button>
+                <button onclick="handleLogin()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20 active:scale-95 transform duration-100">Entra nel Lab</button>
                 <p class="text-center text-xs text-slate-400 mt-4">Account Demo: admin / password</p>
             </div>
 
-            <div id="form-register" class="space-y-4 hidden overflow-y-auto custom-scrollbar pr-2 pb-2">
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Nome Completo</label>
-                    <input type="text" id="reg-fullname" placeholder="Mario Rossi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
-                </div>
+            <div id="form-register" class="space-y-4 hidden pb-4">
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Nome Utente</label>
                     <input type="text" id="reg-user" placeholder="Es. PokeMaster99" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
@@ -177,26 +211,12 @@
                     <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Email</label>
                     <input type="email" id="reg-email" placeholder="tua@email.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Telefono</label>
-                        <input type="tel" id="reg-phone" placeholder="+39..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Data di Nascita</label>
-                        <input type="date" id="reg-birth" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-500">
-                    </div>
-                </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Città</label>
-                    <input type="text" id="reg-city" placeholder="Roma, Milano..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
-                </div>
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Password</label>
                     <input type="password" id="reg-pass" placeholder="Almeno 8 caratteri" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
                 </div>
                 <div class="flex items-start gap-3 p-2">
-                    <input type="checkbox" id="reg-terms" class="mt-1 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+                    <input type="checkbox" id="reg-terms" class="mt-1 w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
                     <label for="reg-terms" class="text-xs text-slate-500 font-medium leading-snug">
                         Confermo di avere più di 18 anni e accetto i <a href="#" class="text-blue-600 hover:underline">Termini</a>.
                     </label>
@@ -207,42 +227,43 @@
     </section>
 
     <!-- APP PRINCIPALE -->
-    <div id="app-container" class="hidden">
-        <header class="glass-header sticky top-0 z-50 px-6 py-4">
+    <div id="app-container" class="hidden min-h-screen bg-slate-50">
+        
+        <!-- HEADER (Adattato Mobile) -->
+        <header class="glass-header sticky top-0 z-40 px-4 py-3 md:px-6 md:py-4">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <div class="flex items-center gap-6">
-                    <!-- LOGO -->
-                    <div class="flex items-center gap-2 cursor-pointer" onclick="showScreen('home')">
-                        <div class="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-                            <span class="text-white font-black text-xl">T</span>
-                        </div>
-                        <span class="font-extrabold text-xl tracking-tight text-slate-900 uppercase hidden sm:inline">
-                            TRADE<span class="logo-lab-text">LAB</span>
-                        </span>
-                    </div>
-
-                    <!-- TASTO CHAT (RICHIESTA UTENTE) -->
-                    <button onclick="showScreen('chats')" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg transition-colors border border-slate-200 group">
-                        <div class="relative">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                            <span id="nav-badge" class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white hidden"></span>
-                        </div>
-                        <span class="text-xs font-black uppercase tracking-widest">Messaggi</span>
-                    </button>
-                </div>
                 
+                <!-- LOGO -->
+                <div class="flex items-center gap-2 cursor-pointer" onclick="showScreen('home')">
+                    <div class="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                        <span class="text-white font-black text-xl">T</span>
+                    </div>
+                    <span class="font-extrabold text-lg tracking-tight text-slate-900 uppercase">
+                        TRADE<span class="logo-lab-text">LAB</span>
+                    </span>
+                </div>
+
+                <!-- DESKTOP NAV -->
                 <nav class="hidden md:flex items-center gap-8 text-sm font-bold text-slate-600 uppercase tracking-tighter">
                     <a href="#" onclick="showScreen('home')" class="hover:text-blue-600 transition-colors">Esplora</a>
                     <a href="#" onclick="showScreen('wishlist')" class="hover:text-blue-600 transition-colors">Wishlist</a>
                     <a href="#" onclick="showScreen('favorites')" class="hover:text-blue-600 transition-colors">Preferiti</a>
+                    <a href="#" onclick="showScreen('chats')" class="hover:text-blue-600 transition-colors">Messaggi</a>
                 </nav>
 
-                <div class="flex items-center gap-4">
+                <!-- USER & NOTIFICATIONS -->
+                <div class="flex items-center gap-3">
+                     <!-- Mobile Chat Icon Top Right -->
+                    <button onclick="showScreen('chats')" class="md:hidden relative p-2 text-slate-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        <span id="nav-badge" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white hidden"></span>
+                    </button>
+
                     <div class="text-right hidden sm:block">
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Bentornato</p>
                         <p id="header-username" class="text-xs font-black text-slate-900 uppercase">User</p>
                     </div>
-                    <button onclick="showScreen('profile')" class="group flex items-center justify-center w-10 h-10 bg-slate-200 hover:bg-slate-300 rounded-full transition-colors border border-slate-300 overflow-hidden">
+                    <button onclick="showScreen('profile')" class="group flex items-center justify-center w-9 h-9 md:w-10 md:h-10 bg-slate-200 hover:bg-slate-300 rounded-full transition-colors border border-slate-300 overflow-hidden">
                         <img id="header-avatar" src="" class="w-full h-full object-cover">
                     </button>
                 </div>
@@ -250,19 +271,20 @@
         </header>
 
         <!-- SCREEN: HOME -->
-        <section id="screen-home" class="screen active max-w-7xl mx-auto px-6 py-8 pb-32">
-            <div class="mb-12 grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div class="lg:col-span-8 bg-slate-900 rounded-2xl p-10 text-white relative overflow-hidden border border-slate-800">
-                    <div class="relative z-10 max-w-lg">
-                        <span class="text-blue-400 font-bold text-xs uppercase tracking-widest mb-4 block">Nuovi Arrivi</span>
-                        <h1 class="text-4xl md:text-5xl font-black mb-4 uppercase tracking-tighter leading-none">Il marketplace definitivo.</h1>
-                        <p class="text-slate-400 mb-8 text-lg font-medium">Acquista, vendi e scambia carte certificate con sicurezza.</p>
-                        <button onclick="showPublishModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-blue-900/20 uppercase text-xs tracking-widest">Inizia a Vendere</button>
+        <section id="screen-home" class="screen active max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+            <!-- Hero Banner -->
+            <div class="mb-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-8 bg-slate-900 rounded-2xl p-6 md:p-10 text-white relative overflow-hidden border border-slate-800 shadow-xl">
+                    <div class="relative z-10">
+                        <span class="text-blue-400 font-bold text-[10px] md:text-xs uppercase tracking-widest mb-2 md:mb-4 block">Nuovi Arrivi</span>
+                        <h1 class="text-3xl md:text-5xl font-black mb-3 md:mb-4 uppercase tracking-tighter leading-none">Marketplace<br>Definitivo.</h1>
+                        <p class="text-slate-400 mb-6 text-sm md:text-lg font-medium max-w-xs md:max-w-lg">Acquista, vendi e scambia carte certificate con sicurezza.</p>
+                        <button onclick="showPublishModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold transition-all shadow-lg shadow-blue-900/20 uppercase text-[10px] md:text-xs tracking-widest active:scale-95">Inizia a Vendere</button>
                     </div>
-                    <div class="absolute right-[-10%] top-[-10%] w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+                    <div class="absolute right-[-20%] top-[-20%] w-64 h-64 md:w-96 md:h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
                 </div>
                 
-                <div class="lg:col-span-4 bg-white border border-slate-200 rounded-2xl p-8 flex flex-col justify-between shadow-sm">
+                <div class="hidden lg:flex lg:col-span-4 bg-white border border-slate-200 rounded-2xl p-8 flex-col justify-between shadow-sm">
                     <div>
                         <h3 class="font-black text-xl mb-2 uppercase tracking-tight">Wishlist Live</h3>
                         <p class="text-slate-500 text-sm font-medium">Hai <span id="wishlist-count-text" class="text-blue-600 font-black">0</span> carte in osservazione.</p>
@@ -273,35 +295,38 @@
                 </div>
             </div>
 
-            <div class="sticky top-24 z-40 bg-slate-50/80 backdrop-blur-md py-4 mb-8">
-                <div class="flex flex-col md:flex-row gap-4">
-                    <div class="search-bar-pro flex-1 flex items-center px-4 py-3">
+            <!-- Search & Filters -->
+            <div class="sticky top-[68px] md:top-24 z-30 bg-slate-50/95 backdrop-blur-md py-2 md:py-4 mb-6 -mx-4 px-4 md:mx-0 md:px-0 border-b md:border-none border-slate-100 md:bg-transparent">
+                <div class="flex flex-col md:flex-row gap-3 md:gap-4">
+                    <div class="search-bar-pro flex-1 flex items-center px-4 py-3 shadow-sm">
                         <svg class="text-slate-400 w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        <input type="text" id="main-search" placeholder="Cerca carta, set o utente..." class="w-full outline-none text-sm font-bold uppercase tracking-tight placeholder:text-slate-400" onkeyup="handleSearch(event)">
+                        <input type="text" id="main-search" placeholder="Cerca..." class="w-full outline-none text-sm font-bold uppercase tracking-tight placeholder:text-slate-400 bg-transparent" onkeyup="handleSearch(event)">
                     </div>
                     
-                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                        <button onclick="filterCategory('all', event)" class="category-btn active whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black bg-blue-600 text-white border border-blue-600 shadow-sm transition-all uppercase tracking-widest">Tutti</button>
-                        <button onclick="filterCategory('pokemon', event)" class="category-btn whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black bg-white border border-slate-200 shadow-sm hover:border-blue-500 transition-all uppercase tracking-widest">Pokémon</button>
-                        <button onclick="filterCategory('onepiece', event)" class="category-btn whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black bg-white border border-slate-200 shadow-sm hover:border-blue-500 transition-all uppercase tracking-widest">One Piece</button>
-                        <button onclick="filterCategory('yugioh', event)" class="category-btn whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black bg-white border border-slate-200 shadow-sm hover:border-blue-500 transition-all uppercase tracking-widest">Yu-Gi-Oh!</button>
-                        <button onclick="filterCategory('mtg', event)" class="category-btn whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black bg-white border border-slate-200 shadow-sm hover:border-blue-500 transition-all uppercase tracking-widest">Magic</button>
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 md:mx-0 md:px-0">
+                        <button onclick="filterCategory('all', event)" class="category-btn active whitespace-nowrap px-4 md:px-6 py-2.5 md:py-3 rounded-xl text-[10px] font-black bg-blue-600 text-white border border-blue-600 shadow-sm transition-all uppercase tracking-widest flex-shrink-0">Tutti</button>
+                        <button onclick="filterCategory('pokemon', event)" class="category-btn whitespace-nowrap px-4 md:px-6 py-2.5 md:py-3 rounded-xl text-[10px] font-black bg-white border border-slate-200 shadow-sm transition-all uppercase tracking-widest flex-shrink-0">Pokémon</button>
+                        <button onclick="filterCategory('onepiece', event)" class="category-btn whitespace-nowrap px-4 md:px-6 py-2.5 md:py-3 rounded-xl text-[10px] font-black bg-white border border-slate-200 shadow-sm transition-all uppercase tracking-widest flex-shrink-0">One Piece</button>
+                        <button onclick="filterCategory('yugioh', event)" class="category-btn whitespace-nowrap px-4 md:px-6 py-2.5 md:py-3 rounded-xl text-[10px] font-black bg-white border border-slate-200 shadow-sm transition-all uppercase tracking-widest flex-shrink-0">Yu-Gi-Oh!</button>
+                        <button onclick="filterCategory('mtg', event)" class="category-btn whitespace-nowrap px-4 md:px-6 py-2.5 md:py-3 rounded-xl text-[10px] font-black bg-white border border-slate-200 shadow-sm transition-all uppercase tracking-widest flex-shrink-0">Magic</button>
                     </div>
                 </div>
             </div>
 
-            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+            <!-- Product Grid -->
+            <div id="product-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6"></div>
             <div id="search-empty" class="hidden py-20 text-center flex flex-col items-center">
                 <h3 class="text-xl font-black text-slate-800 uppercase tracking-tighter">Nessun match trovato</h3>
             </div>
         </section>
 
-        <!-- SCREEN: CHATS (MESSAGGI) -->
-        <section id="screen-chats" class="screen max-w-6xl mx-auto px-6 py-12 h-[calc(100vh-100px)]">
-            <div class="flex h-full bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl">
+        <!-- SCREEN: CHATS (MOBILE OPTIMIZED) -->
+        <section id="screen-chats" class="screen max-w-6xl mx-auto px-0 md:px-6 py-0 md:py-12 md:h-[calc(100vh-100px)] h-[calc(100vh-140px)]">
+            <div class="flex h-full bg-white md:border md:border-slate-200 md:rounded-3xl overflow-hidden md:shadow-xl w-full">
+                
                 <!-- Sidebar Lista Chat -->
-                <div class="w-full md:w-1/3 border-r border-slate-100 flex flex-col bg-slate-50/50">
-                    <div class="p-6 border-b border-slate-100">
+                <div id="chat-list-container" class="w-full md:w-1/3 border-r border-slate-100 flex flex-col bg-slate-50">
+                    <div class="p-4 md:p-6 border-b border-slate-100 bg-white">
                         <h2 class="text-xl font-black text-slate-900 uppercase tracking-tighter">Messaggi</h2>
                     </div>
                     <div id="chat-list" class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
@@ -310,40 +335,43 @@
                 </div>
                 
                 <!-- Area Conversazione -->
-                <div id="chat-area" class="hidden md:flex flex-1 flex-col bg-white relative">
+                <div id="chat-area" class="hidden md:flex flex-1 flex-col bg-white relative w-full h-full fixed top-0 left-0 z-50 md:static">
                     <!-- Header Chat -->
-                    <div id="chat-header" class="p-4 border-b border-slate-100 flex items-center justify-between bg-white/80 backdrop-blur-sm z-10">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden"><img id="chat-partner-img" src="" class="w-full h-full object-cover"></div>
-                            <div>
-                                <h3 id="chat-partner-name" class="font-black text-sm uppercase text-slate-900">Seleziona una chat</h3>
-                                <p id="chat-item-title" class="text-[10px] font-bold text-slate-400 uppercase">...</p>
-                            </div>
+                    <div id="chat-header" class="p-3 md:p-4 border-b border-slate-100 flex items-center gap-3 bg-white/95 backdrop-blur-sm z-10 sticky top-0 shadow-sm md:shadow-none">
+                        <!-- Mobile Back Button -->
+                        <button onclick="closeChatMobile()" class="md:hidden p-2 -ml-2 text-slate-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        </button>
+
+                        <div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden shrink-0"><img id="chat-partner-img" src="" class="w-full h-full object-cover"></div>
+                        <div class="flex-1 min-w-0">
+                            <h3 id="chat-partner-name" class="font-black text-sm uppercase text-slate-900 truncate">Seleziona una chat</h3>
+                            <p id="chat-item-title" class="text-[10px] font-bold text-slate-400 uppercase truncate">...</p>
                         </div>
                     </div>
 
                     <!-- Messaggi -->
-                    <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50/30 custom-scrollbar flex flex-col">
+                    <div id="chat-messages" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-slate-50 custom-scrollbar flex flex-col pb-24 md:pb-6">
                         <div class="flex flex-col items-center justify-center h-full text-slate-400">
                             <svg class="w-16 h-16 mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                            <p class="text-sm font-bold uppercase tracking-widest">Nessuna conversazione selezionata</p>
+                            <p class="text-sm font-bold uppercase tracking-widest">Nessuna conversazione</p>
                         </div>
                     </div>
 
                     <!-- Input Area -->
-                    <div id="chat-input-area" class="p-4 border-t border-slate-100 bg-white hidden">
+                    <div id="chat-input-area" class="p-3 md:p-4 border-t border-slate-100 bg-white absolute bottom-0 w-full md:relative">
                         <div class="flex gap-2">
                             <!-- Input File Nascosto -->
                             <input type="file" id="chat-image-input" class="hidden" accept="image/*" onchange="handleImageUpload(event)">
                             
                             <!-- Bottone Fotocamera -->
-                            <button onclick="document.getElementById('chat-image-input').click()" class="bg-slate-100 hover:bg-slate-200 text-slate-500 p-3 rounded-xl transition-all border border-slate-200">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <button onclick="document.getElementById('chat-image-input').click()" class="bg-slate-100 text-slate-500 p-3 rounded-xl active:bg-slate-200">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                             </button>
 
-                            <input type="text" id="message-input" placeholder="Scrivi un messaggio..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-blue-500 transition-all">
-                            <button onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl transition-all shadow-lg shadow-blue-600/20">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                            <input type="text" id="message-input" placeholder="Scrivi..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-blue-500 transition-all">
+                            <button onclick="sendMessage()" class="bg-blue-600 text-white p-3 rounded-xl shadow-lg shadow-blue-600/20 active:bg-blue-700">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                             </button>
                         </div>
                     </div>
@@ -352,43 +380,42 @@
         </section>
 
         <!-- SCREEN: FAVORITES -->
-        <section id="screen-favorites" class="screen max-w-7xl mx-auto px-6 py-12">
-            <h2 class="text-4xl font-black mb-8 text-slate-900 uppercase tracking-tighter">I tuoi Preferiti</h2>
-            <div id="fav-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6"></div>
+        <section id="screen-favorites" class="screen max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
+            <h2 class="text-3xl md:text-4xl font-black mb-6 md:mb-8 text-slate-900 uppercase tracking-tighter">I tuoi Preferiti</h2>
+            <div id="fav-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6"></div>
             <div id="empty-fav" class="hidden text-center py-20 text-slate-400 font-bold uppercase text-xs tracking-widest">Ancora nulla nei preferiti.</div>
         </section>
 
         <!-- SCREEN: WISHLIST -->
-        <section id="screen-wishlist" class="screen max-w-4xl mx-auto px-6 py-12">
-            <div class="flex justify-between items-center mb-10">
+        <section id="screen-wishlist" class="screen max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-12">
+            <div class="flex justify-between items-center mb-6 md:mb-10">
                 <div>
-                    <h2 class="text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none">Wishlist</h2>
-                    <p class="text-slate-500 mt-2 font-medium">Avvisami quando queste carte compaiono.</p>
+                    <h2 class="text-3xl md:text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none">Wishlist</h2>
                 </div>
-                <button onclick="showWishModal()" class="btn-primary flex items-center gap-2 uppercase text-xs tracking-widest font-black">Aggiungi</button>
+                <button onclick="showWishModal()" class="btn-primary flex items-center gap-2 uppercase text-[10px] md:text-xs tracking-widest font-black bg-slate-900 text-white px-4 py-2 rounded-lg">Aggiungi</button>
             </div>
-            <div id="wishlist-grid" class="space-y-4"></div>
-            <div id="empty-wishlist" class="hidden py-20 text-center text-slate-400 border-2 border-dashed border-slate-200 rounded-3xl font-bold uppercase text-xs">La tua lista è vuota.</div>
+            <div id="wishlist-grid" class="space-y-3 md:space-y-4"></div>
+            <div id="empty-wishlist" class="hidden py-16 md:py-20 text-center text-slate-400 border-2 border-dashed border-slate-200 rounded-3xl font-bold uppercase text-xs">La tua lista è vuota.</div>
         </section>
 
         <!-- SCREEN: PROFILE -->
-        <section id="screen-profile" class="screen max-w-4xl mx-auto px-6 py-12 pb-32">
-            <div class="bg-white border border-slate-200 rounded-3xl p-8 mb-10 flex flex-col sm:flex-row items-start gap-8 shadow-sm relative">
+        <section id="screen-profile" class="screen max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-12">
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 mb-6 md:mb-10 flex flex-col sm:flex-row items-center sm:items-start gap-6 md:gap-8 shadow-sm relative">
                 
-                <div class="absolute top-6 right-6 flex gap-3">
-                    <button onclick="showEditProfileModal()" class="text-[10px] font-black uppercase text-blue-600 hover:text-blue-800 tracking-widest border border-blue-100 bg-blue-50 px-3 py-1.5 rounded-lg transition-colors">Modifica</button>
-                    <button onclick="logout()" class="text-[10px] font-black uppercase text-red-500 hover:text-red-700 tracking-widest border border-red-100 bg-red-50 px-3 py-1.5 rounded-lg transition-colors">Esci</button>
+                <div class="absolute top-4 right-4 flex gap-2">
+                    <button onclick="showEditProfileModal()" class="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-3 py-2 rounded-lg">Modifica</button>
+                    <button onclick="logout()" class="text-[10px] font-black uppercase text-red-500 bg-red-50 px-3 py-2 rounded-lg">Esci</button>
                 </div>
 
-                <div class="w-28 h-28 rounded-full border-4 border-slate-100 bg-slate-50 overflow-hidden flex-shrink-0 shadow-inner">
+                <div class="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-slate-100 bg-slate-50 overflow-hidden flex-shrink-0 shadow-inner mt-4 sm:mt-0">
                     <img id="profile-img" src="" alt="Avatar" class="w-full h-full object-cover">
                 </div>
                 
-                <div class="flex-1 w-full">
-                    <h2 class="text-3xl font-black text-slate-900 uppercase tracking-tighter" id="profile-username">Utente</h2>
-                    <p id="profile-bio" class="text-slate-500 text-sm font-medium mt-2 mb-4 leading-relaxed max-w-md italic">Nessuna biografia inserita.</p>
+                <div class="flex-1 w-full text-center sm:text-left">
+                    <h2 class="text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-tighter" id="profile-username">Utente</h2>
+                    <p id="profile-bio" class="text-slate-500 text-sm font-medium mt-2 mb-4 leading-relaxed italic mx-auto sm:mx-0">Nessuna biografia inserita.</p>
                     
-                    <div class="flex items-center gap-4 mb-4">
+                    <div class="flex items-center justify-center sm:justify-start gap-4 mb-4">
                         <div class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-lg border border-yellow-100">
                             <span class="text-yellow-500 text-lg">★</span>
                             <span id="profile-rating-val" class="font-black text-slate-800 text-sm">0.0</span>
@@ -396,65 +423,101 @@
                         <span class="text-slate-400 text-xs font-bold uppercase tracking-widest"><span id="profile-reviews-count">0</span> Recensioni</span>
                     </div>
 
-                    <div class="flex justify-start gap-2">
+                    <div class="flex justify-center sm:justify-start gap-2">
                         <span class="px-3 py-1 bg-slate-900 text-[9px] font-black rounded-lg text-white uppercase tracking-widest">Seller</span>
                         <span class="px-3 py-1 bg-blue-600 text-[9px] font-black rounded-lg text-white uppercase tracking-widest">Verified</span>
                     </div>
                 </div>
             </div>
             
-            <div class="mb-12">
+            <div class="mb-8 md:mb-12">
                 <h3 class="font-black text-sm text-slate-400 uppercase tracking-widest mb-4">Ultime Recensioni</h3>
                 <div id="reviews-list" class="space-y-3"></div>
             </div>
 
-            <h3 class="font-black text-xl mb-6 uppercase tracking-tight flex items-center gap-3">
+            <h3 class="font-black text-lg md:text-xl mb-6 uppercase tracking-tight flex items-center gap-3">
                 Inventario (<span id="live-inventory-count">0</span>)
                 <span class="h-px bg-slate-200 flex-1"></span>
             </h3>
             
-            <div id="my-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
-            <div id="empty-inventory" class="hidden py-20 text-center text-slate-400 border-2 border-dashed border-slate-200 rounded-3xl font-bold uppercase text-xs">Nessun oggetto in vendita.</div>
+            <div id="my-cards-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-6"></div>
+            <div id="empty-inventory" class="hidden py-16 md:py-20 text-center text-slate-400 border-2 border-dashed border-slate-200 rounded-3xl font-bold uppercase text-xs">Nessun oggetto in vendita.</div>
         </section>
 
         <!-- SCREEN: DETAIL -->
-        <section id="screen-detail" class="screen max-w-6xl mx-auto px-6 py-12">
-            <button onclick="showScreen('home')" class="mb-8 flex items-center gap-2 font-black text-xs text-slate-400 hover:text-slate-900 transition-colors uppercase tracking-widest">
+        <section id="screen-detail" class="screen max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-12">
+            <button onclick="showScreen('home')" class="mb-4 md:mb-8 flex items-center gap-2 font-black text-xs text-slate-400 hover:text-slate-900 transition-colors uppercase tracking-widest">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Torna allo Shop
             </button>
-            <div id="detail-content" class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-2xl shadow-slate-200/50"></div>
+            <div id="detail-content" class="bg-white border border-slate-200 rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl shadow-slate-200/50"></div>
         </section>
 
-        <!-- FAB -->
-        <button onclick="showPublishModal()" class="fixed bottom-8 right-8 bg-blue-600 text-white px-6 py-4 rounded-full shadow-2xl shadow-blue-500/40 flex items-center gap-3 hover:scale-105 transition-all z-40">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M12 4v16m8-8H4"></path></svg>
-            <span class="font-bold text-sm uppercase">Vendi Carta</span>
-        </button>
     </div>
 
-    <!-- MODALS -->
-    <div id="wish-modal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-6">
-        <div class="bg-white w-full max-w-md p-8 rounded-3xl shadow-2xl relative">
-            <button onclick="closeWishModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-900">
+    <!-- MOBILE BOTTOM NAVIGATION (Novità Mobile) -->
+    <nav id="mobile-nav" class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-slate-200 z-[90] md:hidden hidden pb-safe">
+        <div class="flex justify-around items-center h-16 pb-2">
+            <button onclick="showScreen('home')" id="nav-home" class="bottom-nav-item active w-1/5">
+                <div class="bottom-nav-indicator"></div>
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            </button>
+            
+            <button onclick="showScreen('wishlist')" id="nav-wishlist" class="bottom-nav-item w-1/5">
+                <div class="bottom-nav-indicator"></div>
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+            </button>
+
+            <!-- Tasto Vendi Centrale -->
+            <button onclick="showPublishModal()" class="w-12 h-12 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-600/30 flex items-center justify-center -mt-6 transform transition-transform active:scale-90">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+            </button>
+
+            <button onclick="showScreen('favorites')" id="nav-favorites" class="bottom-nav-item w-1/5">
+                <div class="bottom-nav-indicator"></div>
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+            </button>
+
+            <button onclick="showScreen('profile')" id="nav-profile" class="bottom-nav-item w-1/5">
+                <div class="bottom-nav-indicator"></div>
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- DESKTOP FAB (Hidden on mobile) -->
+    <button onclick="showPublishModal()" class="hidden md:flex fixed bottom-8 right-8 bg-blue-600 text-white px-6 py-4 rounded-full shadow-2xl shadow-blue-500/40 items-center gap-3 hover:scale-105 transition-all z-40">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M12 4v16m8-8H4"></path></svg>
+        <span class="font-bold text-sm uppercase">Vendi Carta</span>
+    </button>
+
+    <!-- MODALS (Full width on mobile) -->
+    <div id="wish-modal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm hidden flex items-end md:items-center justify-center p-0 md:p-6">
+        <div class="bg-white w-full max-w-md p-6 md:p-8 rounded-t-3xl md:rounded-3xl shadow-2xl relative h-auto max-h-[90vh] overflow-y-auto">
+            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 md:hidden"></div>
+            <button onclick="closeWishModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-900 hidden md:block">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
             <h2 class="text-2xl font-black mb-6 text-slate-900 uppercase tracking-tighter">Nuova Ricerca</h2>
-            <div class="space-y-4">
+            <div class="space-y-4 pb-safe">
                 <input type="text" id="w-title" placeholder="Nome Carta..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold uppercase tracking-tight outline-none focus:border-blue-500">
                 <input type="text" id="w-set" placeholder="Set..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold uppercase tracking-tight outline-none focus:border-blue-500">
                 <input type="text" id="w-image" placeholder="URL Immagine (Opzionale)" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold tracking-tight outline-none focus:border-blue-500">
-                <button onclick="addWishManual()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black mt-4 shadow-lg shadow-blue-500/20 uppercase tracking-widest text-[10px]">Salva Wishlist</button>
+                <div class="flex gap-2">
+                    <button onclick="closeWishModal()" class="flex-1 bg-slate-100 text-slate-600 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] md:hidden">Annulla</button>
+                    <button onclick="addWishManual()" class="flex-[2] bg-blue-600 text-white py-4 rounded-xl font-black shadow-lg shadow-blue-500/20 uppercase tracking-widest text-[10px]">Salva</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="publish-modal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-6">
-        <div class="bg-white w-full max-w-md p-8 rounded-3xl shadow-2xl relative">
-            <button onclick="closePublishModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-900">
+    <div id="publish-modal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm hidden flex items-end md:items-center justify-center p-0 md:p-6">
+        <div class="bg-white w-full max-w-md p-6 md:p-8 rounded-t-3xl md:rounded-3xl shadow-2xl relative h-auto max-h-[90vh] overflow-y-auto">
+            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 md:hidden"></div>
+            <button onclick="closePublishModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-900 hidden md:block">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
             <h2 class="text-2xl font-black mb-6 text-slate-900 uppercase tracking-tighter">Vendi Oggetto</h2>
-            <div class="space-y-4">
+            <div class="space-y-4 pb-safe">
                 <input type="text" id="p-title" placeholder="Nome Carta..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold uppercase tracking-tight outline-none focus:border-blue-500">
                 <input type="text" id="p-image-url" placeholder="URL Immagine..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold tracking-tight outline-none focus:border-blue-500">
                 <div class="grid grid-cols-2 gap-4">
@@ -466,18 +529,22 @@
                         <option value="mtg">Magic</option>
                     </select>
                 </div>
-                <button onclick="publishItem()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black mt-4 shadow-lg shadow-blue-500/20 uppercase tracking-widest text-[10px]">Pubblica Annuncio</button>
+                <div class="flex gap-2">
+                    <button onclick="closePublishModal()" class="flex-1 bg-slate-100 text-slate-600 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] md:hidden">Annulla</button>
+                    <button onclick="publishItem()" class="flex-[2] bg-blue-600 text-white py-4 rounded-xl font-black shadow-lg shadow-blue-500/20 uppercase tracking-widest text-[10px]">Pubblica</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="edit-profile-modal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-6">
-        <div class="bg-white w-full max-w-md p-8 rounded-3xl shadow-2xl relative">
-            <button onclick="closeEditProfileModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-900">
+    <div id="edit-profile-modal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm hidden flex items-end md:items-center justify-center p-0 md:p-6">
+        <div class="bg-white w-full max-w-md p-6 md:p-8 rounded-t-3xl md:rounded-3xl shadow-2xl relative h-auto max-h-[90vh] overflow-y-auto">
+            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 md:hidden"></div>
+            <button onclick="closeEditProfileModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-900 hidden md:block">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
             <h2 class="text-2xl font-black mb-6 text-slate-900 uppercase tracking-tighter">Modifica Profilo</h2>
-            <div class="space-y-4">
+            <div class="space-y-4 pb-safe">
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">URL Avatar</label>
                     <input type="text" id="edit-avatar" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-medium outline-none focus:border-blue-500">
@@ -486,7 +553,10 @@
                     <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Bio (Max 150 car.)</label>
                     <textarea id="edit-bio" rows="3" placeholder="Scrivi qualcosa su di te..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-medium outline-none focus:border-blue-500 resize-none"></textarea>
                 </div>
-                <button onclick="saveProfile()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black mt-4 uppercase tracking-widest text-[10px]">Salva Modifiche</button>
+                <div class="flex gap-2">
+                    <button onclick="closeEditProfileModal()" class="flex-1 bg-slate-100 text-slate-600 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] md:hidden">Annulla</button>
+                    <button onclick="saveProfile()" class="flex-[2] bg-slate-900 text-white py-4 rounded-xl font-black uppercase tracking-widest text-[10px]">Salva</button>
+                </div>
             </div>
         </div>
     </div>
@@ -517,7 +587,7 @@
 
         let favorites = [];
         let manualWishlist = [];
-        let myChats = []; // Array per le chat { id, seller, itemId, itemTitle, messages: [] }
+        let myChats = []; 
         let currentFilterCategory = 'all';
 
         // --- AUTH ---
@@ -569,6 +639,8 @@
             currentUser = userProfile.name;
             document.getElementById('screen-auth').style.display = 'none';
             document.getElementById('app-container').classList.remove('hidden');
+            document.getElementById('mobile-nav').classList.remove('hidden'); // Show nav on mobile
+            document.getElementById('mobile-nav').classList.add('flex'); // Show nav on mobile
             document.getElementById('header-username').innerText = currentUser;
             document.getElementById('header-avatar').src = userProfile.avatar;
             toast(`Benvenuto, ${currentUser}!`);
@@ -578,6 +650,8 @@
         function logout() {
             currentUser = null;
             document.getElementById('app-container').classList.add('hidden');
+            document.getElementById('mobile-nav').classList.add('hidden');
+            document.getElementById('mobile-nav').classList.remove('flex');
             document.getElementById('screen-auth').style.display = 'flex';
         }
 
@@ -639,20 +713,23 @@
 
             myItems.forEach(item => {
                 const el = document.createElement('div');
-                el.className = 'card-pro p-4 flex flex-col group overflow-hidden';
+                el.className = 'card-pro p-3 md:p-4 flex flex-col group overflow-hidden';
                 el.innerHTML = `
                     <div class="relative aspect-[3/4] mb-3 rounded-lg overflow-hidden border border-slate-100 bg-slate-50">
                         <img src="${item.image}" class="w-full h-full object-cover">
                         <div class="delete-overlay absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center p-4">
                             <button onclick="deleteMyItem(${item.id}, event)" class="bg-red-600 text-white p-3 rounded-full hover:bg-red-500 shadow-xl transition-all flex flex-col items-center gap-1">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                 <span class="text-[8px] font-black uppercase">Rimuovi</span>
                             </button>
                         </div>
+                         <!-- Mobile Delete visible always if needed or via long press - simplified here -->
+                         <button onclick="deleteMyItem(${item.id}, event)" class="md:hidden absolute top-1 right-1 bg-red-500 text-white rounded-full p-1.5 shadow-md">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
                     </div>
-                    <h4 class="font-black text-xs uppercase text-slate-800 truncate mb-1">${item.title}</h4>
+                    <h4 class="font-black text-[10px] md:text-xs uppercase text-slate-800 truncate mb-1">${item.title}</h4>
                     <div class="flex justify-between items-center">
-                        <span class="text-sm font-black text-blue-600">${item.price} €</span>
+                        <span class="text-xs md:text-sm font-black text-blue-600">${item.price} €</span>
                         <span class="text-[8px] font-black uppercase text-green-500 bg-green-50 px-2 py-1 rounded">Live</span>
                     </div>
                 `;
@@ -684,19 +761,38 @@
         // --- NAVIGATION ---
         function showScreen(screenId) {
             if(!currentUser && screenId !== 'auth') return;
+            
+            // Hide all screens
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            
+            // Show target
             const target = document.getElementById(`screen-${screenId}`);
             if (target) {
                 target.classList.add('active');
+                
+                // Render content
                 if(screenId === 'wishlist') renderWishlist();
                 if(screenId === 'favorites') renderFavorites();
                 if(screenId === 'profile') renderProfile();
                 if(screenId === 'home') renderProducts();
-                if(screenId === 'chats') renderChatList();
-                if(screenId !== 'chats') {
-                    // Mobile fix for header visibility on chats
-                    document.querySelector('header').style.display = 'block';
+                if(screenId === 'chats') {
+                    renderChatList();
+                    // On mobile, reset to list view when entering chat screen
+                    document.getElementById('chat-list-container').classList.remove('hidden');
+                    document.getElementById('chat-area').classList.add('hidden');
+                    document.getElementById('chat-area').classList.remove('flex');
+                    // On desktop, ensure flex
+                    if(window.innerWidth >= 768) {
+                        document.getElementById('chat-area').classList.remove('hidden');
+                        document.getElementById('chat-area').classList.add('flex');
+                    }
                 }
+
+                // Update Mobile Nav Active State
+                document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.remove('active'));
+                const navItem = document.getElementById(`nav-${screenId}`);
+                if(navItem) navItem.classList.add('active');
+
                 window.scrollTo(0, 0);
             }
         }
@@ -707,7 +803,6 @@
             const item = items.find(i => i.id === itemId);
             if(!item) return;
 
-            // Controlla se esiste già una chat per questo oggetto con questo venditore
             let existingChat = myChats.find(c => c.itemId === item.id && c.seller === item.seller);
             
             if(!existingChat) {
@@ -746,7 +841,7 @@
             myChats.forEach(chat => {
                 const el = document.createElement('div');
                 const isActive = currentChatId === chat.id;
-                el.className = `p-4 rounded-xl cursor-pointer transition-all border ${isActive ? 'bg-white border-blue-500 shadow-md' : 'bg-white border-slate-200 hover:border-blue-300'}`;
+                el.className = `p-3 md:p-4 rounded-xl cursor-pointer transition-all border ${isActive ? 'bg-white border-blue-500 shadow-md' : 'bg-white border-slate-200 hover:border-blue-300'}`;
                 el.onclick = () => openChat(chat.id);
                 el.innerHTML = `
                     <div class="flex items-center gap-3">
@@ -758,7 +853,7 @@
                                 <h4 class="font-black text-xs uppercase text-slate-800 truncate">@${chat.seller}</h4>
                                 <span class="text-[9px] font-bold text-slate-400">${chat.lastDate}</span>
                             </div>
-                            <p class="text-xs text-slate-500 truncate font-medium">${chat.itemTitle}</p>
+                            <p class="text-xs text-slate-500 truncate font-medium">${chat.lastMessage}</p>
                         </div>
                     </div>
                 `;
@@ -771,13 +866,16 @@
             const chat = myChats.find(c => c.id === chatId);
             if(!chat) return;
 
-            // UI Updates
-            renderChatList(); // Update active state
-            
-            // Mobile handling: show chat area, hide list if on small screen (omitted for simplicity, keeping desktop focus)
-            document.getElementById('chat-area').classList.remove('hidden');
-            document.getElementById('chat-area').classList.add('flex');
-            document.getElementById('chat-input-area').classList.remove('hidden');
+            // MOBILE VIEW LOGIC
+            const isMobile = window.innerWidth < 768;
+            if (isMobile) {
+                document.getElementById('chat-list-container').classList.add('hidden');
+                document.getElementById('chat-area').classList.remove('hidden');
+                document.getElementById('chat-area').classList.add('flex');
+                document.getElementById('mobile-nav').style.display = 'none'; // Hide bottom nav in chat
+            }
+
+            renderChatList(); // Update active highlight
 
             document.getElementById('chat-partner-name').innerText = `@${chat.seller}`;
             document.getElementById('chat-partner-img').src = chat.sellerAvatar;
@@ -799,7 +897,18 @@
             });
             
             // Scroll to bottom
-            msgContainer.scrollTop = msgContainer.scrollHeight;
+            setTimeout(() => {
+                msgContainer.scrollTop = msgContainer.scrollHeight;
+            }, 50);
+        }
+
+        function closeChatMobile() {
+            document.getElementById('chat-list-container').classList.remove('hidden');
+            document.getElementById('chat-area').classList.add('hidden');
+            document.getElementById('chat-area').classList.remove('flex');
+            document.getElementById('mobile-nav').style.display = 'flex'; // Show bottom nav again
+            currentChatId = null;
+            renderChatList();
         }
 
         function handleImageUpload(e) {
@@ -814,13 +923,12 @@
                     chat.lastMessage = "📷 Foto";
                     chat.lastDate = "Adesso";
                     
-                    // Simula risposta
                     setTimeout(() => {
                         const responses = ["Wow, ottima condizione!", "Grazie per la foto.", "Interessante...", "Ok, ci penso."];
                         const randomResp = responses[Math.floor(Math.random() * responses.length)];
                         chat.messages.push({ text: randomResp, fromMe: false });
                         renderChatList();
-                        if(currentChatId === chat.id) openChat(chat.id); // Refresh view
+                        if(currentChatId === chat.id) openChat(chat.id);
                     }, 2000);
 
                     renderChatList();
@@ -828,7 +936,7 @@
                 }
             };
             reader.readAsDataURL(file);
-            e.target.value = ''; // Reset input
+            e.target.value = '';
         }
 
         function sendMessage() {
@@ -842,24 +950,23 @@
                 chat.lastMessage = text;
                 chat.lastDate = "Adesso";
                 
-                // Simula risposta
                 setTimeout(() => {
                     const responses = ["Certamente, è disponibile!", "Posso scendere un po' col prezzo.", "Ti mando altre foto appena posso.", "Ottima scelta!"];
                     const randomResp = responses[Math.floor(Math.random() * responses.length)];
                     chat.messages.push({ text: randomResp, fromMe: false });
                     renderChatList();
-                    if(currentChatId === chat.id) openChat(chat.id); // Refresh view
+                    if(currentChatId === chat.id) openChat(chat.id);
                 }, 1500);
 
                 input.value = '';
-                openChat(chat.id); // Refresh view
+                openChat(chat.id);
             }
         }
 
         // --- CORE LOGIC ---
         function deleteMyItem(id, e) {
             if(e) e.stopPropagation();
-            if (confirm("L'hai venduto? Verrà generata una recensione automatica.")) {
+            if (confirm("L'hai venduto?")) {
                 const reviewers = ["PokeMaster", "YugiBoy", "CollectorX", "RedTrainer"];
                 const texts = ["Ottimo venditore!", "Tutto perfetto.", "Consigliato!", "Velocissimo."];
                 userProfile.reviews.unshift({
@@ -908,18 +1015,18 @@
             filtered.forEach(item => {
                 const isFav = favorites.includes(item.id);
                 const card = document.createElement('div');
-                card.className = 'card-pro p-4 flex flex-col group cursor-pointer';
+                card.className = 'card-pro p-3 md:p-4 flex flex-col group cursor-pointer';
                 card.onclick = (e) => { if(!e.target.closest('button')) showDetail(item.id) };
                 card.innerHTML = `
-                    <div class="aspect-[3/4] mb-4 bg-slate-50 rounded-lg overflow-hidden relative border border-slate-100">
+                    <div class="aspect-[3/4] mb-3 md:mb-4 bg-slate-50 rounded-lg overflow-hidden relative border border-slate-100">
                         <img src="${item.image}" class="w-full h-full object-cover">
-                        <button onclick="toggleFavorite(${item.id}, event)" class="absolute top-2 right-2 p-2 bg-white/90 rounded-full shadow hover:bg-white transition-all">
-                            <svg class="w-4 h-4" fill="${isFav ? 'red' : 'none'}" stroke="${isFav ? 'red' : 'black'}" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        <button onclick="toggleFavorite(${item.id}, event)" class="absolute top-2 right-2 p-1.5 md:p-2 bg-white/90 rounded-full shadow hover:bg-white transition-all">
+                            <svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="${isFav ? 'red' : 'none'}" stroke="${isFav ? 'red' : 'black'}" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                         </button>
                     </div>
-                    <h3 class="font-black text-xs text-slate-800 uppercase truncate">${item.title}</h3>
-                    <div class="flex justify-between items-center mt-2">
-                        <span class="text-lg font-black">${item.price} €</span>
+                    <h3 class="font-black text-[10px] md:text-xs text-slate-800 uppercase truncate">${item.title}</h3>
+                    <div class="flex justify-between items-center mt-1 md:mt-2">
+                        <span class="text-sm md:text-lg font-black">${item.price} €</span>
                         <span class="text-[8px] font-bold text-slate-400 uppercase">@${item.seller}</span>
                     </div>
                 `;
@@ -932,18 +1039,18 @@
             const container = document.getElementById('detail-content');
             container.innerHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2">
-                    <div class="p-8 bg-slate-50 flex justify-center items-center border-r border-slate-200">
-                        <img src="${item.image}" class="max-w-[300px] w-full rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-500">
+                    <div class="p-6 md:p-8 bg-slate-50 flex justify-center items-center border-b md:border-b-0 md:border-r border-slate-200">
+                        <img src="${item.image}" class="max-w-[200px] md:max-w-[300px] w-full rounded-2xl shadow-xl transform md:hover:scale-105 transition-transform duration-500">
                     </div>
-                    <div class="p-8 md:p-12 flex flex-col justify-center">
+                    <div class="p-6 md:p-12 flex flex-col justify-center">
                         <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-600 text-[10px] font-black uppercase tracking-widest w-fit mb-4">${item.category}</span>
-                        <h2 class="text-3xl md:text-4xl font-black mb-2 uppercase text-slate-900 leading-none">${item.title}</h2>
+                        <h2 class="text-2xl md:text-4xl font-black mb-2 uppercase text-slate-900 leading-none">${item.title}</h2>
                         <div class="flex items-baseline gap-2 mb-6">
-                             <div class="text-4xl font-black text-blue-600">${item.price} €</div>
-                             <div class="text-xs font-bold text-slate-400 uppercase">Prezzo Base</div>
+                             <div class="text-3xl md:text-4xl font-black text-blue-600">${item.price} €</div>
+                             <div class="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Prezzo Base</div>
                         </div>
                         
-                        <div class="flex items-center gap-3 mb-8 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <div class="flex items-center gap-3 mb-8 p-3 md:p-4 bg-slate-50 rounded-xl border border-slate-100">
                             <div class="w-10 h-10 bg-slate-200 rounded-full overflow-hidden">
                                 <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${item.seller}" class="w-full h-full object-cover">
                             </div>
@@ -953,18 +1060,18 @@
                             </div>
                         </div>
 
-                        <div class="space-y-3">
-                            <button onclick="toast('Funzionalità Acquisto in arrivo!')" class="w-full bg-green-600 hover:bg-green-500 text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest transition-all shadow-lg shadow-green-900/20 flex items-center justify-center gap-2">
+                        <div class="space-y-3 pb-safe">
+                            <button onclick="toast('Funzionalità Acquisto in arrivo!')" class="w-full bg-green-600 hover:bg-green-500 text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest transition-all shadow-lg shadow-green-900/20 flex items-center justify-center gap-2 active:scale-95">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
                                 Acquista Ora
                             </button>
                             
                             <div class="grid grid-cols-2 gap-3">
-                                <button onclick="toast('Funzionalità Scambio in arrivo!')" class="bg-purple-600 hover:bg-purple-500 text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest transition-all shadow-lg shadow-purple-900/20 flex items-center justify-center gap-2">
+                                <button onclick="toast('Funzionalità Scambio in arrivo!')" class="bg-purple-600 hover:bg-purple-500 text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest transition-all shadow-lg shadow-purple-900/20 flex items-center justify-center gap-2 active:scale-95">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                                     Scambia
                                 </button>
-                                <button onclick="startChat(${item.id})" class="bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest transition-all shadow-lg shadow-slate-900/20 flex items-center justify-center gap-2">
+                                <button onclick="startChat(${item.id})" class="bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest transition-all shadow-lg shadow-slate-900/20 flex items-center justify-center gap-2 active:scale-95">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                                     Chatta
                                 </button>
@@ -984,13 +1091,13 @@
             empty.classList.add('hidden');
             manualWishlist.forEach(wish => {
                 const el = document.createElement('div');
-                el.className = 'bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between';
+                el.className = 'bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm';
                 el.innerHTML = `
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-16 bg-slate-50 rounded border flex-shrink-0"><img src="${wish.image}" class="w-full h-full object-cover"></div>
-                        <div><h3 class="font-black text-xs uppercase">${wish.title}</h3><p class="text-[9px] text-slate-400 font-bold uppercase">${wish.set}</p></div>
+                        <div><h3 class="font-black text-xs uppercase text-slate-900">${wish.title}</h3><p class="text-[9px] text-slate-400 font-bold uppercase">${wish.set}</p></div>
                     </div>
-                    <button onclick="manualWishlist = manualWishlist.filter(w=>w.id!==${wish.id}); renderWishlist();" class="text-slate-300 hover:text-red-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                    <button onclick="manualWishlist = manualWishlist.filter(w=>w.id!==${wish.id}); renderWishlist();" class="text-slate-300 hover:text-red-500 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                 `;
                 grid.appendChild(el);
             });
@@ -1005,9 +1112,9 @@
             empty.classList.add('hidden');
             favItems.forEach(item => {
                 const el = document.createElement('div');
-                el.className = 'card-pro p-4 cursor-pointer';
+                el.className = 'card-pro p-3 cursor-pointer';
                 el.onclick = () => showDetail(item.id);
-                el.innerHTML = `<img src="${item.image}" class="aspect-[3/4] object-cover rounded mb-2"><h4 class="font-black text-[10px] uppercase truncate">${item.title}</h4>`;
+                el.innerHTML = `<img src="${item.image}" class="aspect-[3/4] object-cover rounded mb-2 w-full"><h4 class="font-black text-[10px] uppercase truncate text-center">${item.title}</h4>`;
                 grid.appendChild(el);
             });
         }
@@ -1024,7 +1131,11 @@
 
         function filterCategory(cat, e) {
             currentFilterCategory = cat;
-            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active', 'bg-blue-600', 'text-white'));
+            document.querySelectorAll('.category-btn').forEach(b => {
+                b.classList.remove('active', 'bg-blue-600', 'text-white');
+                b.classList.add('bg-white', 'text-slate-900');
+            });
+            e.target.classList.remove('bg-white', 'text-slate-900');
             e.target.classList.add('active', 'bg-blue-600', 'text-white');
             renderProductsBySearch(document.getElementById('main-search').value.toLowerCase());
         }
@@ -1043,7 +1154,7 @@
         function toast(m) {
             const c = document.getElementById('toast-container');
             const t = document.createElement('div');
-            t.className = 'bg-slate-900 text-white px-6 py-3 rounded-xl shadow-xl text-[10px] font-black uppercase';
+            t.className = 'bg-slate-900/90 backdrop-blur-md text-white px-6 py-4 rounded-2xl shadow-2xl text-[10px] font-black uppercase tracking-widest animate-bounce';
             t.innerText = m;
             c.appendChild(t);
             setTimeout(() => t.remove(), 2500);
@@ -1058,6 +1169,7 @@
     </script>
 </body>
 </html>
+
 
 
 
